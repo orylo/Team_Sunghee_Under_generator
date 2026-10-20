@@ -2,38 +2,58 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<title>BF Type Generator</title>
-<meta name="robots" content="noindex, nofollow, noarchive">
+<title>BF Type Generator v2</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow, noarchive">
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: #0d0d0d; color: #ddd; font-family: -apple-system, "Apple SD Gothic Neo", sans-serif; padding: 28px 28px 80px; }
+body { background: #0b0b0b; color: #ddd; font-family: -apple-system, "Apple SD Gothic Neo", sans-serif; padding: 26px 26px 80px; }
 h1 { font-size: 20px; font-weight: 600; color: #fff; }
-.sub { font-size: 13px; color: #999; margin: 6px 0 16px; line-height: 1.7; max-width: 1200px; }
-.bar { display: flex; gap: 12px 16px; align-items: center; flex-wrap: wrap; font-size: 13px; background: #161616; border: 1px solid #262626; border-radius: 10px; padding: 12px 14px; margin-bottom: 22px; position: sticky; top: 8px; z-index: 5; }
+h1 span { color: #FF5F1F; }
+.sub { font-size: 13px; color: #999; margin: 6px 0 14px; line-height: 1.7; max-width: 1200px; }
+.panel { display: flex; gap: 14px; flex-wrap: wrap; align-items: stretch; margin-bottom: 14px; }
+.drop { flex: 1 1 360px; border: 2px dashed #3a3a3a; border-radius: 12px; padding: 14px; color: #aaa; font-size: 13px; cursor: pointer; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; min-height: 86px; }
+.drop.over { border-color: #FF5F1F; color: #fff; }
+.drop .hint { flex: 1 1 200px; line-height: 1.6; }
+.thumbs { display: flex; gap: 6px; flex-wrap: wrap; }
+.thumb { position: relative; width: 54px; height: 68px; border-radius: 4px; overflow: hidden; background: #222; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; }
+.thumb button { position: absolute; top: 2px; right: 2px; width: 18px; height: 18px; border-radius: 50%; border: 0; background: rgba(0,0,0,.7); color: #fff; font-size: 11px; cursor: pointer; line-height: 18px; }
+.bar { display: flex; gap: 10px 16px; align-items: center; flex-wrap: wrap; font-size: 13px; background: #151515; border: 1px solid #262626; border-radius: 10px; padding: 12px 14px; margin-bottom: 20px; position: sticky; top: 8px; z-index: 5; }
 .bar label { display: flex; gap: 6px; align-items: center; color: #bbb; }
+.bar .manual { display: contents; }
+body.recipe .bar .manual { display: none; }
+.sethead .pair { color: #bbb; } .sethead .lock.on { border-color: #FF5F1F; color: #FF5F1F; }
 .bar select, .bar input[type=number] { background: #222; color: #eee; border: 1px solid #3a3a3a; border-radius: 6px; padding: 5px 6px; font-size: 13px; }
-.bar button { background: #c8ff3c; color: #000; border: 0; padding: 8px 14px; border-radius: 7px; cursor: pointer; font-weight: 700; font-size: 13px; }
+.bar input[type=range] { width: 90px; }
+.bar button { background: #FF5F1F; color: #000; border: 0; padding: 8px 14px; border-radius: 7px; cursor: pointer; font-weight: 700; font-size: 13px; }
 .bar .ghost { background: #222; color: #eee; border: 1px solid #3a3a3a; font-weight: 500; }
-#cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 22px; }
+.set { margin-bottom: 30px; }
+.sethead { display: flex; gap: 10px; align-items: center; margin-bottom: 8px; font-size: 12.5px; color: #888; }
+.sethead b { color: #fff; font-size: 14px; }
+.sethead button { background: #1d1d1d; color: #ddd; border: 1px solid #333; border-radius: 5px; font-size: 11.5px; padding: 4px 8px; cursor: pointer; }
+.sethead button:hover, .btns button:hover { border-color: #FF5F1F; }
+.row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+#sets { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.set { border: 1px solid #262626; border-radius: 12px; padding: 12px; margin-bottom: 0; background: #111; }
+.sethead { flex-wrap: wrap; }
+@media (max-width: 1100px) { #sets { grid-template-columns: 1fr; } }
 .card canvas { width: 100%; aspect-ratio: 4 / 5; display: block; background: #000; cursor: pointer; }
-.card.selected canvas { outline: 3px solid #c8ff3c; outline-offset: 3px; }
-.tag { font-size: 11.5px; color: #888; line-height: 1.5; margin-top: 8px; }
-.tag b { color: #ddd; font-weight: 600; }
-.btns { display: flex; gap: 4px; margin-top: 6px; flex-wrap: wrap; }
-.btns button { background: #1d1d1d; color: #ddd; border: 1px solid #333; border-radius: 5px; font-size: 11px; padding: 4px 7px; cursor: pointer; }
-.btns button:hover { border-color: #c8ff3c; }
-.legend { margin-top: 30px; font-size: 12.5px; color: #888; line-height: 1.8; max-width: 1200px; }
-.legend b { color: #ccc; }
+.card.selected canvas { outline: 3px solid #FF5F1F; outline-offset: 3px; }
+.tag { font-size: 11.5px; color: #999; margin-top: 6px; }
+.btns { display: flex; gap: 4px; margin-top: 5px; flex-wrap: wrap; }
+.btns button { background: #1d1d1d; color: #ddd; border: 1px solid #333; border-radius: 5px; font-size: 10.5px; padding: 3px 6px; cursor: pointer; }
+.audit { font-size: 11px; margin-top: 4px; line-height: 1.5; }
+.audit.pass { color: #7fdc6a; } .audit.warn { color: #f5c044; } .audit.fail { color: #ff6b6b; }
+#fontWarn { color: #ff6b6b; font-size: 13px; margin-bottom: 10px; }
+#toast { position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%); background: #222; color: #fff; border: 1px solid #FF5F1F; border-radius: 10px; padding: 12px 16px; font-size: 13px; max-width: 560px; line-height: 1.6; z-index: 20; }
 [hidden] { display: none !important; }
 .screen { min-height: 80vh; display: flex; align-items: center; justify-content: center; }
 .box { background: #161616; border: 1px solid #262626; border-radius: 14px; padding: 32px; width: min(420px, 100%); }
 .box.wide { width: min(640px, 100%); }
 .box h1 { margin-bottom: 8px; }
 .box p, .box li { font-size: 13.5px; color: #aaa; line-height: 1.7; }
-.box ol { padding-left: 18px; margin: 14px 0; }
-.box ul { list-style: none; margin: 6px 0 10px; }
-.box ul li { font-size: 12.5px; }
+.box ol { padding-left: 18px; margin: 14px 0; } .box ul { list-style: none; margin: 6px 0 10px; } .box ul li { font-size: 12.5px; }
 .ok { color: #c8ff3c; } .no { color: #ff6b6b; } .opt { color: #888; }
 #gateForm { display: flex; gap: 8px; margin-top: 16px; }
 #gateForm input { flex: 1; background: #222; border: 1px solid #3a3a3a; color: #fff; border-radius: 8px; padding: 10px 12px; font-size: 15px; letter-spacing: .2em; }
@@ -41,10 +61,12 @@ h1 { font-size: 20px; font-weight: 600; color: #fff; }
 .box button:disabled { opacity: .35; cursor: default; }
 .box .ghost { background: #222; color: #ccc; border: 1px solid #3a3a3a; font-weight: 500; margin-left: 6px; }
 .err { color: #ff6b6b; min-height: 1.4em; margin-top: 8px; }
-.drop { border: 2px dashed #3a3a3a; border-radius: 12px; padding: 28px 16px; text-align: center; color: #bbb; font-size: 13.5px; cursor: pointer; margin: 12px 0; line-height: 1.7; }
-.drop.over { border-color: #c8ff3c; color: #fff; }
-.drop small { color: #777; }
+.adrop { border: 2px dashed #3a3a3a; border-radius: 12px; padding: 28px 16px; text-align: center; color: #bbb; font-size: 13.5px; cursor: pointer; margin: 12px 0; line-height: 1.7; }
+.adrop.over { border-color: #c8ff3c; color: #fff; }
 code { background: #222; padding: 1px 6px; border-radius: 4px; font-size: 12.5px; }
+.ver { font-size: 12px; color: #888; margin-left: 10px; } .ver a { color: #c8ff3c; }
+body.noimg .imgonly { display: none !important; }
+
 </style>
 </head>
 <body>
@@ -56,125 +78,146 @@ code { background: #222; padding: 1px 6px; border-radius: 4px; font-size: 12.5px
     <p id="pwErr" class="err"></p>
   </div>
 </div>
-
 <div id="setup" class="screen" hidden>
   <div class="box wide">
     <h1>처음 한 번만 준비해요</h1>
     <ol>
       <li><b>폰트</b>: 컴퓨터에 설치된 폰트를 자동으로 찾아요.<ul id="fontList"></ul></li>
-      <li><b>에셋</b>: 팀에서 공유받은 <code>bf-generator-assets.zip</code>을 아래 칸에 끌어다 놓으세요.<ul id="assetList"></ul></li>
+      <li><b>에셋</b>: 팀에서 공유받은 <code>bf-generator-assets.zip</code>을 아래 칸에 끌어다 놓으세요. (v1에서 이미 넣었다면 그대로 쓸 수 있어요)<ul id="assetList"></ul></li>
     </ol>
-    <div id="drop" class="drop">여기에 에셋 zip을 끌어다 놓거나, 클릭해서 고르세요<br><small>설치된 폰트를 못 찾았다면 .ttf / .otf 파일도 여기에 같이 놓으면 돼요</small></div>
-    <input type="file" id="filePick" multiple accept=".zip,.ttf,.otf" hidden>
+    <div id="adrop" class="adrop">여기에 에셋 zip을 끌어다 놓거나, 클릭해서 고르세요<br><small style="color:#777">설치된 폰트를 못 찾았다면 .ttf / .otf 파일도 여기에 같이 놓으면 돼요</small></div>
+    <input type="file" id="afile" multiple accept=".zip,.ttf,.otf" hidden>
     <p id="setupMsg" class="err"></p>
     <button id="startBtn" disabled>제너레이터 열기</button><button id="resetBtn" class="ghost">저장된 파일 지우기</button>
-    <p style="margin-top:14px;font-size:12px;color:#666">에셋과 폰트는 이 브라우저 안에만 저장되고 어디에도 업로드되지 않아요.</p>
+    <p style="margin-top:14px;font-size:12px;color:#666">에셋, 폰트, 이미지는 이 브라우저 안에만 저장되고 어디에도 업로드되지 않아요.</p>
   </div>
 </div>
-
 <div id="app" hidden>
-<h1>BF Type Generator</h1>
-<p class="sub">랜덤 Problem Grid 위에 위계 규칙을 지키면서 타이포를 얹어요. 시드 번호로 같은 시안을 다시 불러올 수 있어요. 저장 버튼: <b>PNG</b>(기본) · <b>투명</b>(배경·패턴 없이 글자·로고·손그림만) · <b>그리드</b>(그리드 선 포함) · <b>SVG 아웃라인</b>(Figma용: 글자가 벡터라 모양은 가이드 장평 그대로, 다시 타이핑만 안 됨) · <b>SVG 텍스트</b>(Figma용: 장평 대신 가장 가까운 Neue Plak 폭 패밀리로 바꿔 타이핑 가능, 모양은 조금 달라짐). 둘 다 레이어 분리 + 그리드 레이어 포함.</p>
+<h1>BF Type Generator <span style="color:#c8ff3c">v2</span><span class="ver"><a href="./v1/">v1로 보기</a></span></h1>
+<p class="sub" id="subText">AI 이미지를 끌어다 놓으면 장노출 모션 블러, 듀오톤 열 번짐, 그레인·하프톤 가공 위에 불협화음 레이아웃과 마킹을 얹어요. <b>룩 하나(사진+레이아웃)를 이미지 버전과 그레인 버전 2장</b>으로 뽑고, 룩마다 레드 ↔ 오렌지를 바꿀 수 있어요. 이미지를 넣기 전에는 레이아웃만 볼 수 있게 어두운 임시 배경이 나와요. 이 파일은 이 컴퓨터에서만 열려요.</p>
+<p id="fontWarn" hidden></p>
+
+<div class="panel imgonly">
+  <div class="drop" id="drop">
+    <div class="hint" id="hintText"><b>내 이미지</b>를 여기에 끌어다 놓으세요 (B·C안, 여러 장 가능)<br><small style="color:#777">이미지는 이 브라우저 안에만 저장돼요. 룩마다 이 중 한 장이 랜덤으로 들어가요.</small></div>
+    <div class="thumbs" id="thumbs"></div>
+  </div>
+  <input type="file" id="pick" accept="image/*" multiple hidden>
+</div>
 
 <div class="bar">
-  <button id="regen">전부 새로 생성 ↻</button>
-  <label>레이아웃
-    <select id="layoutMode">
-      <option value="random">랜덤</option>
-      <option value="irregular">불규칙</option>
-      <option value="simple">간단 (정적·단정)</option>
-      <option value="repeat">단어 반복</option>
-    </select></label>
-  <label>서체
-    <select id="fontMode">
-      <option value="np">Neue Plak</option>
-      <option value="mad">MAD Sans</option>
-      <option value="mix">섞기 (페어링)</option>
-      <option value="random">랜덤</option>
-    </select></label>
-  <label>헤드라인
-    <select id="split">
-      <option value="random">랜덤</option>
-      <option value="2">black / friday.</option>
-      <option value="3">black / fri / day.</option>
-      <option value="1">black friday.</option>
-    </select></label>
-  <label>컬러
-    <select id="color">
-      <option value="random">랜덤</option>
-      <option value="uagrad">브랜드 컬러 그라데이션</option>
-      <option value="core">브랜드 코어 단색</option>
-      <option value="accent">블랙 + 포인트 1색</option>
-      <option value="clash">충돌 컬러</option>
-      <option value="gradient">그라데이션 (자유 색)</option>
-      <option value="thermal">열화상</option>
-    </select></label>
-  <label>로고
-    <select id="logo">
-      <option value="random">랜덤</option>
-      <option value="symbol">심볼</option>
-      <option value="wordmark">워드마크</option>
-      <option value="both">심볼 + 워드마크</option>
-      <option value="grainy">그레이니 심볼</option>
-    </select></label>
-  <label>패턴
-    <select id="pattern">
-      <option value="none">없음</option>
-      <option value="random">랜덤</option>
-      <option value="clean">클린 반복 타이포</option>
-      <option value="gritty">그리티 반복 타이포</option>
-      <option value="drawn">손그림 마크</option>
-    </select></label>
-  <label>패턴 범위
-    <select id="zone">
-      <option value="free">빈 칸만 (가이드 권장)</option>
-      <option value="full">전체</option>
-    </select></label>
-  <label>그레인 <input type="range" id="grain" min="0" max="100" value="35"></label>
+  <button id="regen">새로 뽑기 ↻</button>
+  <label>내 안 <select id="preset"><option value="A">A · dark horse.</option><option value="B">B · bring the heat.</option><option value="C">C · again.</option></select></label>
+  <label>모드 <select id="mode"><option value="recipe">자동 조합 (추천)</option><option value="manual">수동</option></select></label>
+  <label>검수 <select id="audit"><option value="show">표시만</option><option value="nofail" selected>✕ 위반은 다시 뽑기</option><option value="pass">✓ 통과만</option></select></label>
+  <label>자동 추천 <select id="tries"><option value="1">끔</option><option value="8">보통</option><option value="16" selected>강하게</option></select></label>
+  <label>룩 수 <select id="nsets"><option>2</option><option selected>4</option><option>6</option><option>8</option></select></label>
+  <label>포인트 컬러 <select id="point"><option value="org">네온 오렌지 (B)</option><option value="lime">라임 (A)</option><option value="cob">코발트 (C)</option></select></label>
+  <label class="imgonly">이미지 프레임 <select id="frame"><option value="random">랜덤</option><option value="full">꽉 채움</option><option value="box">그리드 박스</option><option value="strip">가로 띠</option><option value="column">세로 띠</option></select></label>
+  <label>헤드라인 <select id="split"><option value="random">랜덤</option><option value="2">black / friday.</option><option value="3">black / fri / day.</option><option value="1">black friday.</option></select></label>
+  <label>서체 <select id="fontMode"><option value="np">Neue Plak</option><option value="mix">섞기</option><option value="mad">MAD Sans</option></select></label>
+  <label>로고 <select id="logo"><option value="random">랜덤</option><option value="symbol">심볼</option><option value="grainy">그레인 장은 그레이니 심볼</option></select></label>
+  <span class="manual imgonly"><label>가공 <select id="treat"><option value="random">랜덤</option><option value="natural">자연색 (사진 그대로)</option><option value="duo">듀오톤 열 번짐</option></select></label>
+  <label>바탕 <select id="ground"><option value="random">랜덤</option><option value="dark">어둡게</option><option value="light">밝게</option><option value="color">컬러</option></select></label></span>
+  <label class="imgonly">모션 블러 <input type="range" id="motion" min="0" max="100" value="20"></label>
+  <label class="imgonly">번짐 <input type="range" id="blur" min="0" max="40" value="10"></label>
+  <label class="imgonly">노출 <input type="range" id="expo" min="60" max="300" value="140" title="높을수록 배경이 차갑게(어둡게), 밝은 부분만 뜨겁게"></label>
+  <label class="imgonly">밴딩 <input type="range" id="band" min="0" max="12" value="0"></label>
+  <label class="imgonly">글리치 <input type="range" id="glitch" min="0" max="100" value="0"></label>
+  <label>정보 크기 <input type="range" id="infoSize" min="22" max="64" value="42" title="정보 글자 대문자 높이(px). 폰에서는 약 0.36배로 보여요"></label>
+  <label>그레인 <input type="range" id="grain" min="0" max="100" value="30"></label>
+  <span class="manual imgonly"><label><input type="checkbox" id="halftone"> 하프톤(그레인 장)</label></span>
+  <label hidden><input type="checkbox" id="useBuiltin" checked></label>
+  <span class="manual"><label><input type="checkbox" id="tone"> 톤온톤 조각</label></span>
+  <label><input type="checkbox" id="marks" checked> 마킹</label>
+  <label><input type="checkbox" id="lab"> 실험 팔레트</label>
   <label><input type="checkbox" id="showgrid"> 그리드</label>
-  <label>미리보기
-    <select id="preview">
-      <option value="stretch">장평 (가이드 원본)</option>
-      <option value="family">폭 패밀리 (SVG 텍스트 결과)</option>
-    </select></label>
-  <label>시드 <input type="number" id="seedIn" style="width:86px" placeholder="번호"></label>
+  <label>미리보기 <select id="preview"><option value="stretch">장평</option><option value="family">폭 패밀리</option></select></label>
+  <label>시드 <input type="number" id="seedIn" style="width:80px"></label>
   <button class="ghost" id="load">불러오기</button>
-  <button class="ghost" id="toSetup">설정</button>
 </div>
 
-<div id="cards"></div>
-
-<p class="legend"><b>레이아웃</b> — 불규칙: drop(한 칸씩 내려가기) · ref(가운데만 내려감) · span(한 단어가 여러 칸) · split(장평 190 vs 30) / 간단: 한 줄 또는 두 줄 왼쪽 정렬, 정보는 바로 아래 표로 / 반복: 같은 문장 반복 · 단어 반복 · 장평 램프 · 지그재그.<br>
-<b>패턴</b> — 클린/그리티 반복 타이포는 가이드 p56–57 방식(배경과 같은 계열의 톤온톤). 손그림은 가이드 p78 에셋 12종 중 원·밑줄·낙서를 헤드라인 조각 하나에만 써요(가이드: "매우 아껴서"). '빈 칸만'은 글자·로고가 있는 가로 칸을 피해서 패턴을 깔아요(가이드: 텍스처 바로 위에 타이포 금지).<br>
-<b>브랜드 컬러 그라데이션</b> — 브랜드 레드 #DC0019, 블랙, 화이트, 그레이(#494949 · #9B9B9B · #BBBBBB · #E3E3E5)와 쿨 그레이(#14141E · #282832 · #50505A · #8C8C96 · #B4B4BF · #F0F0FA)만 써요.</p>
+<div id="sets"></div>
 </div>
+<div id="toast" hidden></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/opentype.js/1.3.4/opentype.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script>
+let ASSET = {};
+// images that ship with this file (picked at random per look)
+const BUILTIN = [];
+// per image: tone (natural / red / orange / thermal), motion direction (radians, null = none), empty area from the prompt [x, y, w, h]
+const BUILTIN_META = [];
+
 /* ===== constants ===== */
-const D = s => new TextDecoder().decode(Uint8Array.from(atob(s), c => c.charCodeAt(0)));
-const BRAND = { name: D('VU5ERVIgQVJNT1VS'), w1: D('VU5ERVI='), w2: D('QVJNT1VS'), tag: D('VUEgMjAyNsKu'), copy: D('MjAyNiDCqSBVTkRFUiBBUk1PVVI=') };
-const FW = 1080, FH = 1350, N = 8;
+const FW = 1080, FH = 1350;
 const REF = {
   V: [0, .0223, .0611, .1248, .1577, .2221, .251, .2819, .4987, .571, .7116, .975, 1],
   H: [0, .0243, .043, .1464, .1922, .2512, .3372, .4013, .4593, .5332, .5435, .5795, .9598, 1]
 };
 const STRETCH = [1.9, .9, .65, .45, .3];
 const SPLITS = { 1: ['black friday.'], 2: ['black', 'friday.'], 3: ['black', 'fri', 'day.'] };
-const BR_RED = '#DC0019';
-const BR_DARKS = ['#000000', '#14141E', '#282832', '#494949', '#50505A'];
-const BR_LIGHTS = ['#FFFFFF', '#F0F0FA', '#E3E3E5', '#BBBBBB', '#B4B4BF', '#9B9B9B', '#8C8C96'];
+const RED = '#DC0019', ORANGE = '#FF5F1F', LIME = '#A8FF2E', COBALT = '#2B5BFF';
+// point colours: B = neon orange, A = lime, C = cobalt. A look is either brand (black·red·white) or the chosen point colour
+const ACC = { brw: RED, org: ORANGE, lime: LIME, cob: COBALT };
+const CNAME = { brw: '블·레·화', org: '블랙+오렌지', lime: '블랙+라임', cob: '블랙+코발트' };
+const CFILE = { brw: 'red', org: 'orange', lime: 'lime', cob: 'cobalt' };
 const DRAWN = { circle: [1, 2, 3, 4, 5, 8], underline: [9, 11], scribble: [6, 7, 10] };
-const loadImg = src => new Promise(r => { const i = new Image(); i.onload = () => r(i); i.src = src; });
-let HB, HBL, WM, NOISE, MARKS = {}; const OT = {};
+// duotone heat maps per ground. index 0 = background, last = hottest part of the body
+const PAL = {
+  brw: {
+    dark:  ['#000000', '#1a0003', '#6e000f', RED, '#ff4a5c'],
+    light: ['#E3E3E5', '#dcc3c6', '#e0606c', RED, '#5c000b'],
+    color: ['#5c000b', RED, '#ff4a5c', '#ffd0d5', '#ffffff']
+  },
+  org: {
+    dark:  ['#000000', '#1a0006', '#6e0014', '#e8261b', ORANGE, '#ff9a3c', '#ffe3b8'],
+    light: ['#E3E3E5', '#f2cdb6', ORANGE, '#c4320a', '#3a0a00'],
+    color: ['#4a1c6e', '#c4002a', ORANGE, '#ffb000', '#fff3c4']
+  },
+  lime: {
+    dark:  ['#000000', '#0a1400', '#2f5a00', '#6fc400', LIME, '#e6ffb8'],
+    light: ['#E3E3E5', '#d6edb5', LIME, '#4f8a00', '#1a2e00'],
+    color: ['#1a2e00', '#4f8a00', LIME, '#e6ffb8', '#ffffff']
+  },
+  cob: {
+    dark:  ['#000000', '#00061a', '#001a6e', '#0a33c9', COBALT, '#8fb0ff', '#e6eeff'],
+    light: ['#E3E3E5', '#c3cdf2', COBALT, '#0a1f8f', '#000a33'],
+    color: ['#000a33', '#0a1f8f', COBALT, '#8fb0ff', '#ffffff']
+  }
+};
+const LAB = [
+  ['#05001a', '#2b0a6b', '#8a0a8a', '#e0302a', '#ff9a00', '#ffee70', '#ffffff'],
+  ['#00002a', '#0026ff', '#00d4ff', '#3dff7a', '#fff200', '#ff7a00', '#ff0030'],
+  ['#e9f7f3', '#a6e6d8', '#46b6dc', '#1650c9', '#081b7a'],
+  ['#000000', '#002a2a', '#00b3a4', '#c8ff3c', '#ffffff']
+];
+// each direction (A / B / C) decides the layout family, the two pieces of a look and its point colour
+const PRESETS = {
+  A: { point: 'lime', lm: 'simple', images: false, marks: false, sub: '정적인 레이아웃 · 이미지 없이 솔리드 / 그라데이션 · 포인트 라임',
+       variants: [{ id: 'solid', bg: 'solid', label: '솔리드' }, { id: 'gradient', bg: 'gradient', label: '그라데이션' }] },
+  B: { point: 'org', lm: 'irregular', images: true, marks: true, sub: '불협화음 레이아웃 + 마킹 · 이미지 / 그레인 · 포인트 네온 오렌지',
+       variants: [{ id: 'image', bg: 'image', label: '이미지' }, { id: 'grain', bg: 'grain', label: '그레인' }] },
+  C: { point: 'cob', lm: 'repeat:line', images: true, marks: false, sub: '반복 레이아웃 · 실사 그대로 · 마지막 줄만 포인트 · 포인트 코발트',
+       variants: [{ id: 'sentence', bg: 'image', label: '문장 반복' }, { id: 'word', bg: 'image', lm: 'repeat:word', label: '단어 반복 · 장평 램프' }] }
+};
+const PRESET = () => PRESETS[$('preset').value];
+let VARIANTS = PRESETS.B.variants;
 
-/* ===== rng ===== */
+/* ===== rng & utils ===== */
 function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
 const between = (R, a, b) => a + R() * (b - a);
 const pick = (R, arr) => arr[Math.floor(R() * arr.length)];
 const randInt = (R, a, b) => Math.floor(between(R, a, b + 1));
 function shuffle(R, arr) { const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(R() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+const rgbOf = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
+const hex = c => '#' + c.map(v => Math.round(Math.max(0, Math.min(255, v))).toString(16).padStart(2, '0')).join('');
+function lum(h) { const c = rgbOf(h).map(v => v / 255).map(v => v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4)); return .2126 * c[0] + .7152 * c[1] + .0722 * c[2]; }
+function contrast(a, b) { const x = lum(a), y = lum(b); return (Math.max(x, y) + .05) / (Math.min(x, y) + .05); }
+const loadImg = src => new Promise((r, j) => { const i = new Image(); i.onload = () => r(i); i.onerror = j; i.src = src; });
+const $ = id => document.getElementById(id);
+function toast(t) { const el = $('toast'); el.textContent = t; el.hidden = false; clearTimeout(el._t); el._t = setTimeout(() => el.hidden = true, 6000); }
 
 /* ===== grid ===== */
 function makeGrid(R) {
@@ -182,8 +225,7 @@ function makeGrid(R) {
   const leftGaps = shuffle(R, [...Array(7)].map((_, i) => (REF.V[i + 2] - REF.V[i + 1]) * between(R, .55, 1.45)));
   const leftSpan = .5 - v[1], ls = leftGaps.reduce((a, b) => a + b, 0);
   let p = v[1]; leftGaps.forEach((g, i) => { p += g / ls * leftSpan; v[i + 2] = p; }); v[8] = .5;
-  v[9] = .5 + between(R, .06, .09);
-  v[10] = v[9] + (v[11] - v[9]) * between(R, .3, .6);
+  v[9] = .5 + between(R, .06, .09); v[10] = v[9] + (v[11] - v[9]) * between(R, .3, .6);
   const V = R() < .5 ? v.map(x => 1 - x).reverse() : v;
   const gaps = []; for (let i = 1; i < REF.H.length - 2; i++) gaps.push((REF.H[i + 1] - REF.H[i]) * between(R, .6, 1.4));
   const sh = shuffle(R, gaps), span = REF.H[REF.H.length - 2] - REF.H[1], hs = sh.reduce((a, b) => a + b, 0);
@@ -191,131 +233,63 @@ function makeGrid(R) {
   return { V, H };
 }
 
-/* ===== color ===== */
-function hsl(h, s, l) { h = ((h % 360) + 360) % 360; s /= 100; l /= 100; const k = n => (n + h / 30) % 12, a = s * Math.min(l, 1 - l), f = n => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1))); return '#' + [f(0), f(8), f(4)].map(x => Math.round(x * 255).toString(16).padStart(2, '0')).join(''); }
-const rgbOf = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
-function lum(hex) { const c = rgbOf(hex).map(v => v / 255).map(v => v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4)); return .2126 * c[0] + .7152 * c[1] + .0722 * c[2]; }
-function contrast(a, b) { const x = lum(a), y = lum(b); return (Math.max(x, y) + .05) / (Math.min(x, y) + .05); }
-const bw = bg => contrast(bg, '#ffffff') >= contrast(bg, '#000000') ? '#ffffff' : '#000000';
-function mix(a, b, t = .5) { const x = rgbOf(a), y = rgbOf(b); return '#' + x.map((v, i) => Math.round(v + (y[i] - v) * t).toString(16).padStart(2, '0')).join(''); }
-const THERMAL = [
-  ['#05001a', '#2b0a6b', '#8a0a8a', '#e0302a', '#ff9a00', '#ffee70', '#ffffff'],
-  ['#00002a', '#0026ff', '#00d4ff', '#3dff7a', '#fff200', '#ff7a00', '#ff0030'],
-  ['#e9f7f3', '#a6e6d8', '#46b6dc', '#1650c9', '#081b7a'],
-  ['#1a0000', '#7a0010', BR_RED, '#ff5a1f', '#ffb000', '#fff3c4']
+/* ===== fonts ===== */
+const FONT_DEFS = [
+  { id: 'MADB', names: ['MAD Sans Fill Bold', 'MADSansFill-Bold'] },
+  { id: 'NP', names: ['Neue Plak SemiBold', 'NeuePlak-SemiBold'], required: true },
+  { id: 'NPW', names: ['Neue Plak Wide SemiBold', 'NeuePlak-WideSemiBold'] },
+  { id: 'NPE', names: ['Neue Plak Extended SemiBold', 'NeuePlak-ExtendedSemiBold'] },
+  { id: 'NPN', names: ['Neue Plak Narrow SemiBold', 'NeuePlak-NarrowSemiBold'] },
+  { id: 'NPC', names: ['Neue Plak Condensed SemiBold', 'NeuePlak-CondSemiBold'] },
+  { id: 'NPX', names: ['Neue Plak Compressed SemiBold', 'NeuePlak-CompSemiBold'] },
+  { id: 'MAD', names: ['MAD Sans Fill Regular', 'MADSansFill-Regular'] }
 ];
-function makeColors(R, mode) {
-  if (mode === 'random') mode = pick(R, ['uagrad', 'uagrad', 'core', 'accent', 'clash', 'gradient', 'thermal', 'thermal']);
-  const vivid = () => hsl(between(R, 0, 360), between(R, 80, 100), between(R, 48, 62));
-  let c;
-  if (mode === 'uagrad') {
-    const style = pick(R, ['linear', 'linear', 'radial', 'three', 'heat']);
-    let stops, mean;
-    if (style === 'linear') { stops = pick(R, [[pick(R, BR_DARKS), BR_RED], [BR_RED, pick(R, BR_LIGHTS)], [pick(R, BR_DARKS), pick(R, BR_LIGHTS)], ['#000000', pick(R, BR_DARKS.slice(2))]]); }
-    else if (style === 'three') { stops = pick(R, [['#000000', BR_RED, '#000000'], [pick(R, BR_DARKS), BR_RED, pick(R, BR_LIGHTS)], [BR_RED, '#000000', BR_RED], [pick(R, BR_LIGHTS), pick(R, BR_DARKS), '#000000']]); }
-    else if (style === 'radial') { stops = pick(R, [[BR_RED, '#000000'], ['#FFFFFF', BR_RED], [pick(R, BR_LIGHTS), pick(R, BR_DARKS)], [BR_RED, pick(R, BR_DARKS)]]); }
-    else { stops = pick(R, [['#000000', '#282832', BR_RED, '#FFFFFF'], ['#000000', BR_RED, '#E3E3E5'], ['#14141E', '#50505A', '#B4B4BF', '#FFFFFF']]); }
-    mean = stops.reduce((a, b) => mix(a, b));
-    const fg = bw(mean);
-    const accent = stops.includes(BR_RED) ? fg : BR_RED;
-    const bg = style === 'heat'
-      ? { type: 'thermal', pal: stops, blobs: [...Array(randInt(R, 3, 6))].map(() => ({ x: R(), y: R(), r: between(R, .2, .6), v: between(R, .4, 1) })) }
-      : { type: style === 'radial' ? 'radial' : 'grad', stops, angle: between(R, 0, Math.PI), cx: between(R, .25, .75), cy: between(R, .2, .8) };
-    c = { mode, bg, type: fg, accent, info: fg, tone: mean };
-  } else if (mode === 'core') {
-    const bg = pick(R, ['#000000', '#000000', '#ffffff', BR_RED, '#14141E']), fg = bw(bg);
-    c = { mode, bg: { type: 'solid', c: bg }, type: fg, accent: bg === BR_RED ? fg : BR_RED, info: fg, tone: bg };
-  } else if (mode === 'accent') {
-    const bg = pick(R, ['#000000', '#14141E']);
-    c = { mode, bg: { type: 'solid', c: bg }, type: '#ffffff', accent: vivid(), info: '#ffffff', tone: bg };
-  } else if (mode === 'clash') {
-    let bg, fg, t = 0;
-    do { const h = between(R, 0, 360); bg = hsl(h, between(R, 65, 100), between(R, 40, 60)); fg = hsl(h + between(R, 120, 240), between(R, 85, 100), between(R, 45, 80)); t++; } while (contrast(bg, fg) < 2.6 && t < 40);
-    c = { mode, bg: { type: 'solid', c: bg }, type: fg, accent: fg, info: bw(bg), tone: bg };
-  } else if (mode === 'gradient') {
-    const h = between(R, 0, 360), a = hsl(h, between(R, 70, 100), between(R, 25, 55)), b = hsl(h + between(R, 30, 160), between(R, 70, 100), between(R, 35, 65));
-    const fg = bw(mix(a, b));
-    c = { mode, bg: { type: 'grad', stops: [a, b], angle: between(R, 0, Math.PI) }, type: fg, accent: R() < .5 ? fg : (fg === '#ffffff' ? '#000000' : '#ffffff'), info: fg, tone: mix(a, b) };
-  } else {
-    const pal = pick(R, THERMAL);
-    c = { mode: 'thermal', bg: { type: 'thermal', pal, blobs: [...Array(randInt(R, 3, 7))].map(() => ({ x: R(), y: R(), r: between(R, .15, .55), v: between(R, .35, 1) })) } };
-    c.tone = pal[Math.floor(pal.length * .45)]; c.type = c.accent = c.info = bw(c.tone);
-  }
-  return c;
-}
-
-/* ===== fonts & measuring ===== */
-const FONTS = { np: 'NP', mad: 'MAD', madb: 'MADB' };
+const FONT_OK = {}, OT = {};
+const FAMNAME = { NP: 'Neue Plak SemiBold', NPW: 'Neue Plak Wide SemiBold', NPE: 'Neue Plak Extended SemiBold', NPN: 'Neue Plak Narrow SemiBold', NPC: 'Neue Plak Condensed SemiBold', NPX: 'Neue Plak Compressed SemiBold', MAD: 'MAD Sans Fill' };
+const FAMS = ['NPW', 'NPE', 'NP', 'NPN', 'NPC', 'NPX'].map(id => ({ id }));
 const mctx = document.createElement('canvas').getContext('2d');
 function measure(txt, fs, font = 'NP') { mctx.font = `${fs}px ${font}`; const m = mctx.measureText(txt); return { w: m.width, a: m.actualBoundingBoxAscent, d: m.actualBoundingBoxDescent }; }
 const ASC = {};
 function fsForAscender(txt, h, font) { const k = font + '|' + txt; if (!ASC[k]) ASC[k] = measure(txt, 100, font).a; return 100 * h / ASC[k]; }
+function calibrateFamilies() {
+  const probe = 'black friday. UP TO 40% OFF 11.12', base = measure(probe, 100, 'NP');
+  FAMS.filter(f => FONT_OK[f.id]).forEach(f => { f.ratio = measure(probe, 100, f.id).w / base.w; f.asc = measure('bkfdh', 100, f.id).a / measure('bkfdh', 100, 'NP').a; });
+}
+function liveItem(it) {
+  if (it.font === 'MAD') { const w = measure(it.txt, it.fs, 'MAD').w; return { ...it, s: 1, x: it.right ? it.edge - w : it.x }; }
+  const f = FAMS.filter(f => FONT_OK[f.id]).reduce((a, b) => Math.abs(Math.log(b.ratio / it.s)) < Math.abs(Math.log(a.ratio / it.s)) ? b : a);
+  const fs = it.fs / f.asc, w = measure(it.txt, fs, f.id).w;
+  return { ...it, font: f.id, fs, s: 1, x: it.right ? it.edge - w : it.x };
+}
 
-/* ===== layout ===== */
-function layout(spec) {
-  const R = mulberry32(spec.seed * 7 + 13), G = spec.grid;
+/* ===== layout (irregular only: the B direction) ===== */
+function layout(set, rseed, lmOverride) {
+  const R = mulberry32(rseed != null ? rseed : set.seed * 7 + 13), G = set.grid, lm = lmOverride || set.layoutMode || 'irregular';
   const X = i => G.V[i] * FW, Y = i => G.H[i] * FH;
+  // momentum: follow the image's movement (Problematic "momentum image")
+  const md = metaOf(set).dir, eff = md == null ? null : md + set.fx.rot;
+  const flow = eff == null ? null : Math.abs(Math.cos(eff)) > .6 ? (Math.cos(eff) > 0 ? 'right' : 'left') : 'vertical';
+  const prevV = px => { for (let i = 11; i >= 1; i--) if (X(i) <= px - 8) return X(i); return null; };
   const LIVE_L = X(1), LIVE_R = X(11), TOP = Y(1), BOT = Y(12);
   const rects = [];
   const hit = (r, pad = 10) => rects.some(o => r.l < o.r + pad && r.r > o.l - pad && r.t < o.b + pad && r.b > o.t - pad);
   const nextV = px => { for (let i = 1; i < 12; i++) if (X(i) >= px + 8) return X(i); return null; };
-  let fontMode = spec.fontMode; if (fontMode === 'random') fontMode = pick(R, ['np', 'np', 'mad', 'mix']);
   const madIdx = randInt(R, 0, 2);
-  const fontFor = i => !FONT_OK.MAD ? 'NP' : fontMode === 'mad' ? 'MAD' : fontMode === 'mix' ? (i === madIdx ? 'MAD' : 'NP') : 'NP';
-
+  const fontFor = i => !FONT_OK.MAD ? 'NP' : set.fontMode === 'mad' ? 'MAD' : set.fontMode === 'mix' ? (i === madIdx ? 'MAD' : 'NP') : 'NP';
   function word(txt, s, x, base, h, alignRight, font = 'NP', strictS = false) {
     if (h < 30) return null;
     const fs = fsForAscender(txt, h, font), m = measure(txt, fs, font);
-    const options = strictS ? [s] : [s, ...STRETCH.filter(v => v < s)];
-    for (const ss of options) {
+    for (const ss of (strictS ? [s] : [s, ...STRETCH.filter(v => v < s)])) {
       const w = m.w * ss, l = alignRight ? x - w : x;
       if (l >= LIVE_L - 1 && l + w <= LIVE_R + 1) return { txt, fs, s: ss, x: l, base, l, r: l + w, t: base - m.a, b: base + m.d, h, font, right: !!alignRight, edge: alignRight ? x : l };
     }
     return null;
   }
-
-  let mode = spec.layoutMode;
-  if (mode === 'random') mode = R() < .5 ? 'irregular' : R() < .5 ? 'simple' : 'repeat';
-  const pieces = SPLITS[spec.split];
+  const pieces = SPLITS[set.split];
   let head = null, strategy;
-
   for (let attempt = 0; attempt < 160 && !head; attempt++) {
     const out = []; rects.length = 0; let ok = true;
-    if (mode === 'irregular') {
-      strategy = pick(R, pieces.length === 1 ? ['span', 'drop'] : pieces.length === 2 ? ['drop', 'span', 'split'] : ['drop', 'ref', 'span']);
-      if (strategy === 'drop') {
-        let r = randInt(R, 1, 7), x = X(randInt(R, 1, 4)); const hero = randInt(R, 0, pieces.length - 1);
-        for (let i = 0; i < pieces.length && ok; i++) {
-          const n = i === hero ? randInt(R, 1, 3) : 1; if (r + n > 12) { ok = false; break; }
-          const w = word(pieces[i], pick(R, STRETCH), x, Y(r + n), Y(r + n) - Y(r), false, fontFor(i));
-          if (!w || hit(w, 0)) { ok = false; break; }
-          out.push(w); rects.push(w); r += n; x = nextV(w.r); if (x == null) { ok = false; break; }
-        }
-      } else if (strategy === 'ref') {
-        const r = randInt(R, 2, 9), x = X(randInt(R, 1, 3)), s = pick(R, [.65, .45, .9]);
-        const a = word(pieces[0], s, x, Y(r + 1), Y(r + 1) - Y(r), false, fontFor(0));
-        const bx = a && nextV(a.r), b = bx != null && a ? word(pieces[1], s, bx, Y(r + 2), Y(r + 2) - Y(r + 1), false, fontFor(1)) : null;
-        const cx = b && nextV(b.r), c = cx != null && b ? word(pieces[2], s, cx, Y(r + 1), Y(r + 1) - Y(r), false, fontFor(2)) : null;
-        if (a && b && c) out.push(a, b, c); else ok = false;
-      } else if (strategy === 'span') {
-        const hi = pieces.length - 1, n = randInt(R, 3, 7), end = randInt(R, Math.min(12, n + 2), 12), start = end - n, right = R() < .6;
-        const hw = word(pieces[hi], pick(R, [.3, .45, .65]), right ? LIVE_R : X(randInt(R, 1, 3)), Y(end), Y(end) - Y(start), right, fontFor(hi));
-        if (!hw) ok = false; else { out.push(hw); rects.push(hw); }
-        let rr = start;
-        for (let i = hi - 1; i >= 0 && ok; i--) {
-          if (rr - 1 < 1) { ok = false; break; }
-          const w = word(pieces[i], pick(R, [1.9, .9, .65]), X(randInt(R, 1, 3)), Y(rr), Y(rr) - Y(rr - 1), false, fontFor(i));
-          if (!w || hit(w, 0)) { ok = false; break; }
-          out.push(w); rects.push(w); rr--;
-        }
-      } else {
-        const r0 = randInt(R, 1, 4), a = word(pieces[0], 1.9, X(1), Y(r0 + 1), Y(r0 + 1) - Y(r0), false, fontFor(0));
-        const n = randInt(R, 3, 6), end = randInt(R, Math.min(12, r0 + 2 + n), 12);
-        const b = word(pieces[1], .3, LIVE_R, Y(end), Y(end) - Y(end - n), true, fontFor(1));
-        if (a && b && b.t > a.b) out.push(a, b); else ok = false;
-      }
-      if (ok && !(out.length === pieces.length && Math.max(...out.map(o => o.h)) >= 160 && out.every(o => o.h >= 75))) ok = false;
-    } else if (mode === 'simple') {
+    if (lm === 'simple') {
       strategy = pick(R, pieces.length === 1 ? ['one'] : ['one', 'two', 'two']);
       const lower = R() < .6, s = pick(R, [.65, .9, .45]);
       if (strategy === 'one') {
@@ -329,322 +303,699 @@ function layout(spec) {
         if (a1 && a2 && a1.h >= 90 && a2.h >= 90 && Math.max(a1.h, a2.h) <= 320) out.push(a1, a2); else ok = false;
       }
       strategy = 'simple-' + strategy;
-    } else {
-      strategy = pick(R, ['line', 'word', 'ramp', 'zigzag']);
+    } else if (lm.startsWith('repeat')) {
+      const kind = lm.split(':')[1], rs = kind === 'line' ? pick(R, ['line', 'line', 'zigzag']) : kind === 'word' ? pick(R, ['word', 'ramp']) : pick(R, ['line', 'word', 'ramp', 'zigzag']);
       const k = randInt(R, 4, 8), r0 = randInt(R, 1, Math.max(1, 12 - k));
-      const lines = strategy === 'word' ? [...Array(k - 1)].map(() => 'black').concat(['friday.']) : [...Array(k)].map(() => 'black friday.');
-      const base = pick(R, [1.9, .9, .65, .45]);
-      // uniform stretch: shrink until every line fits
-      let s = base;
+      const lines = rs === 'word' ? [...Array(k - 1)].map(() => 'black').concat(['friday.']) : [...Array(k)].map(() => 'black friday.');
+      let s = pick(R, [1.9, .9, .65, .45]);
       for (let i = 0; i < k && ok; i++) {
         const r = r0 + i; if (r + 1 > 12) { ok = false; break; }
         const h = Y(r + 1) - Y(r); if (h < 34) { ok = false; break; }
-        const font = fontFor(i % 3), m = measure(lines[i], fsForAscender(lines[i], h, font), font);
-        const ss = strategy === 'ramp' ? STRETCH[Math.min(i, STRETCH.length - 1)] : s;
-        if (m.w * ss > LIVE_R - LIVE_L) { if (strategy === 'ramp') { ok = false; break; } s = Math.min(s, (LIVE_R - LIVE_L) / m.w * .98); }
+        const font = fontFor(i % 3), m = measure(lines[i], fsForAscender(lines[i], h, font), font), ss = rs === 'ramp' ? STRETCH[Math.min(i, STRETCH.length - 1)] : s;
+        if (m.w * ss > LIVE_R - LIVE_L) { if (rs === 'ramp') { ok = false; break; } s = Math.min(s, (LIVE_R - LIVE_L) / m.w * .98); }
       }
       for (let i = 0; i < k && ok; i++) {
-        const r = r0 + i, h = Y(r + 1) - Y(r), ss = strategy === 'ramp' ? STRETCH[Math.min(i, STRETCH.length - 1)] : s;
-        const right = strategy === 'zigzag' && i % 2 === 1;
+        const r = r0 + i, h = Y(r + 1) - Y(r), ss = rs === 'ramp' ? STRETCH[Math.min(i, STRETCH.length - 1)] : s, right = rs === 'zigzag' && i % 2 === 1;
         const w = word(lines[i], ss, right ? LIVE_R : X(1), Y(r + 1), h, right, fontFor(i % 3), true);
         if (!w) { ok = false; break; } out.push(w);
       }
       if (ok && out.reduce((a, o) => a + o.h, 0) < 380) ok = false;
-      strategy = 'repeat-' + strategy;
+      strategy = 'repeat-' + rs;
+    } else {
+    let pool = pieces.length === 1 ? ['span', 'drop'] : pieces.length === 2 ? ['drop', 'span', 'split'] : ['drop', 'ref', 'span'];
+    if (flow === 'vertical') pool = pool.concat(['span', 'span']); else if (flow) pool = pool.concat(pieces.length === 3 ? ['drop', 'ref'] : ['drop', 'drop']);
+    strategy = pick(R, pool);
+    if (strategy === 'drop' && flow === 'left') {
+      // left-moving image: a flush-right stack (one piece per line, same right edge) keeps the reading order
+      let r = randInt(R, 1, 7); const xr = X(randInt(R, 8, 11)), hero = randInt(R, 0, pieces.length - 1);
+      for (let i = 0; i < pieces.length && ok; i++) {
+        const n = i === hero ? randInt(R, 1, 3) : 1; if (r + n > 12) { ok = false; break; }
+        const w = word(pieces[i], pick(R, STRETCH), xr, Y(r + n), Y(r + n) - Y(r), true, fontFor(i));
+        if (!w || hit(w, 0)) { ok = false; break; }
+        out.push(w); rects.push(w); r += n;
+      }
+    } else if (strategy === 'drop') {
+      let r = randInt(R, 1, 7), x = X(randInt(R, 1, 4)); const hero = randInt(R, 0, pieces.length - 1);
+      for (let i = 0; i < pieces.length && ok; i++) {
+        const n = i === hero ? randInt(R, 1, 3) : 1; if (r + n > 12) { ok = false; break; }
+        const w = word(pieces[i], pick(R, STRETCH), x, Y(r + n), Y(r + n) - Y(r), false, fontFor(i));
+        if (!w || hit(w, 0)) { ok = false; break; }
+        out.push(w); rects.push(w); r += n; x = nextV(w.r); if (x == null) { ok = false; break; }
+      }
+    } else if (strategy === 'ref') {
+      const r = randInt(R, 2, 9), x = X(randInt(R, 1, 3)), s = pick(R, [.65, .45, .9]);
+      const a = word(pieces[0], s, x, Y(r + 1), Y(r + 1) - Y(r), false, fontFor(0));
+      const bx = a && nextV(a.r), b = bx != null && a ? word(pieces[1], s, bx, Y(r + 2), Y(r + 2) - Y(r + 1), false, fontFor(1)) : null;
+      const cx = b && nextV(b.r), c = cx != null && b ? word(pieces[2], s, cx, Y(r + 1), Y(r + 1) - Y(r), false, fontFor(2)) : null;
+      if (a && b && c) out.push(a, b, c); else ok = false;
+    } else if (strategy === 'span') {
+      const hi = pieces.length - 1, n = randInt(R, 3, 7), end = randInt(R, Math.min(12, n + 2), 12), start = end - n, right = R() < .6;
+      const hw = word(pieces[hi], pick(R, [.3, .45, .65]), right ? LIVE_R : X(randInt(R, 1, 3)), Y(end), Y(end) - Y(start), right, fontFor(hi));
+      if (!hw) ok = false; else { out.push(hw); rects.push(hw); }
+      let rr = start;
+      for (let i = hi - 1; i >= 0 && ok; i--) {
+        if (rr - 1 < 1) { ok = false; break; }
+        const w = word(pieces[i], pick(R, [1.9, .9, .65]), X(randInt(R, 1, 3)), Y(rr), Y(rr) - Y(rr - 1), false, fontFor(i));
+        if (!w || hit(w, 0)) { ok = false; break; }
+        out.push(w); rects.push(w); rr--;
+      }
+    } else {
+      const r0 = randInt(R, 1, 4), a = word(pieces[0], 1.9, X(1), Y(r0 + 1), Y(r0 + 1) - Y(r0), false, fontFor(0));
+      const n = randInt(R, 3, 6), end = randInt(R, Math.min(12, r0 + 2 + n), 12);
+      const b = word(pieces[1], .3, LIVE_R, Y(end), Y(end) - Y(end - n), true, fontFor(1));
+      if (a && b && b.t > a.b) out.push(a, b); else ok = false;
     }
-    if (ok && out.length && out.every(o => o.b <= FH - 16 && o.t >= 8)) head = out;
+    }
+    const hierOK = lm === 'irregular' ? (out.length === pieces.length && Math.max(...out.map(o => o.h)) >= 160 && out.every(o => o.h >= 75)) : out.length > 0;
+    if (ok && hierOK && out.every(o => o.b <= FH - 16 && o.t >= 8) && readingOrderOK(pieces.length > 1 && strategy === 'span' ? out.slice().reverse() : out)) head = out;
   }
   if (!head) { strategy = 'fallback'; head = [word('black friday.', .45, X(1), Y(8), Y(8) - Y(5)) || word('black friday.', .3, X(1), Y(9), 180)].filter(Boolean); }
   rects.length = 0; head.forEach(h => rects.push(h));
   const heroH = Math.max(...head.map(o => o.h));
-  const headBottom = Math.max(...head.map(o => o.b)), headTop = Math.min(...head.map(o => o.t));
 
-  // ---- logo
-  let logo = spec.logoMode; if (logo === 'random') logo = pick(R, ['symbol', 'symbol', 'wordmark', 'both', 'grainy']);
-  const logos = [];
-  const centerGap = Math.min(...G.V.map(v => Math.abs(v * FW - FW / 2)).filter(d => d > 40));
-  const symW = Math.max(110, Math.min(260, 2 * centerGap));
-  function placeSymbol(prefer) {
-    const w = symW, h = w * 413 / 800;
-    let order = shuffle(R, [...Array(11)].map((_, k) => k + 2));
-    if (prefer === 'top') order = order.sort((a, b) => a - b); if (prefer === 'bottom') order = order.sort((a, b) => b - a);
-    for (const i of order) { const b = Y(i), r = { l: FW / 2 - w / 2, r: FW / 2 + w / 2, t: b - h, b }; if (r.t > TOP - 2 && r.b < FH - 20 && !hit(r, 14)) { logos.push({ kind: 'symbol', ...r }); rects.push(r); return true; } }
-    return false;
+  // logo: centered symbol on a free line; optional big grainy symbol for the grain pieces
+  // symbol size: small = mirror of the nearest grid line, medium = mirror of the next line, large = hero icon (p46: no max)
+  const gaps = G.V.map(v => Math.abs(v * FW - FW / 2)).filter(d => d > 40).sort((a, b) => a - b);
+  const wS = Math.max(110, Math.min(260, 2 * gaps[0])), wM = Math.max(260, Math.min(520, 2 * (gaps[1] || gaps[0] * 2))), wL = FW * between(R, .6, .9);
+  const tier = R() < .5 ? 'S' : R() < .6 ? 'M' : 'L';
+  const sizes = tier === 'L' ? [wL, wM, wS] : tier === 'M' ? [wM, wS] : [wS];
+  let symbol = null;
+  for (const symW of sizes) {
+    const symH = symW * 413 / 800;
+    for (const i of shuffle(R, [...Array(11)].map((_, k) => k + 2))) { const b = Y(i), r = { l: FW / 2 - symW / 2, r: FW / 2 + symW / 2, t: b - symH, b }; if (r.t > TOP - 2 && r.b < FH - 20 && !hit(r, 14)) { symbol = r; rects.push(r); break; } }
+    if (symbol) break;
   }
-  function placeWordmark() {
-    const w = between(R, 260, 380), h = w * 89 / 1200;
-    for (const pos of shuffle(R, ['top', 'bottom'])) { const t = pos === 'top' ? Y(1) + 6 : Y(12) - h - 6, r = { l: FW / 2 - w / 2, r: FW / 2 + w / 2, t, b: t + h }; if (!hit(r, 12)) { logos.push({ kind: 'wordmark', ...r }); rects.push(r); return true; } }
-    return false;
-  }
-  const simplePref = mode === 'simple' ? (headTop > FH / 2 ? 'top' : 'bottom') : null;
-  if (logo === 'symbol') placeSymbol(simplePref) || placeWordmark();
-  else if (logo === 'wordmark') placeWordmark() || placeSymbol(simplePref);
-  else if (logo === 'both') { placeWordmark(); placeSymbol(simplePref); }
-  else { const w = FW * between(R, .8, 1.35); logos.push({ kind: 'grainy', l: FW / 2 - w / 2, r: FW / 2 + w / 2, t: between(R, -.15, .65) * FH, b: 0, w }); }
+  if (!symbol) for (const i of [...Array(12)].map((_, k) => 12 - k)) { const w = 110, h = w * 413 / 800, r = { l: FW / 2 - w / 2, r: FW / 2 + w / 2, t: Y(i) - h, b: Y(i) }; if (r.t > 4 && !hit(r, 4)) { symbol = r; rects.push(r); break; } }
+  const gw = FW * between(R, .85, 1.35), grainy = { l: FW / 2 - gw / 2, t: between(R, -.15, .6) * FH, w: gw };
+  const grainyLogo = set.logoMode === 'grainy' ? true : set.logoMode === 'symbol' ? false : R() < .5;
 
-  // ---- info
-  const cap = Math.min(between(R, 22, 34), heroH / 4);
-  const info = [];
-  const asTable = mode === 'simple' ? R() < .7 : R() < .35;
-  const tableRows = [['EVENT:', 'BLACK FRIDAY'], ['PERIOD:', '11.12 — 11.22'], ['OFFER:', 'UP TO 40% OFF']];
-  let lines = shuffle(R, [...Array(11)].map((_, k) => k + 2));
-  if (mode === 'simple') lines = [...Array(11)].map((_, k) => k + 2).filter(i => Y(i) > headBottom + 8).concat([...Array(11)].map((_, k) => k + 2).filter(i => Y(i) <= headBottom + 8).reverse());
-  if (asTable) {
-    const lh = cap * 1.38, blockH = lh * tableRows.length;
-    const valX = X(G.V.findIndex(v => v * FW > FW * .2));
-    for (const i of lines) {
-      const top = Y(i), r = { l: LIVE_L, r: LIVE_R, t: top, b: top + blockH };
-      if (r.b < BOT && !hit(r, 8)) {
-        tableRows.forEach(([a, b], k) => { const base = top + lh * (k + 1) - lh * .2; info.push(infoItem(a, LIVE_L, base, cap), infoItem(b, valX, base, cap)); });
-        info.push(infoItem(BRAND.copy, LIVE_R, top + lh * .8, cap, true)); rects.push(r); break;
-      }
-    }
+  // info
+  // info cap height: slider ±15%, never louder than a third of the hero piece
+  const cap = Math.min(+$('infoSize').value * between(R, .85, 1.15), heroH / 3), info = [];
+  const lines = shuffle(R, [...Array(11)].map((_, k) => k + 2));
+  if (R() < .35) {
+    const rows = [['EVENT:', 'BLACK FRIDAY'], ['PERIOD:', '11.12 — 11.22'], ['OFFER:', 'UP TO 40% OFF']], lh = cap * 1.38, valX = X(G.V.findIndex(v => v * FW > FW * .2));
+    for (const i of lines) { const top = Y(i), r = { l: LIVE_L, r: LIVE_R, t: top, b: top + lh * 3 }; if (r.b < BOT && !hit(r, 8)) { rows.forEach(([a, b], k) => { const base = top + lh * (k + 1) - lh * .2; info.push(infoItem(a, LIVE_L, base, cap), infoItem(b, valX, base, cap)); }); rects.push(r); break; } }
   }
   if (!info.length) for (const i of lines) { const base = Y(i), r = { l: LIVE_L, r: LIVE_R, t: base - cap, b: base }; if (!hit(r, 8)) { info.push(infoItem('UP TO 40% OFF', LIVE_L, base, cap), infoItem('11.12 — 11.22', LIVE_R, base, cap, true)); rects.push(r); break; } }
   if (!info.length) info.push(infoItem('UP TO 40% OFF', LIVE_L, Y(12), cap), infoItem('11.12 — 11.22', LIVE_R, Y(12), cap, true));
 
-  // ---- pattern
-  let pattern = spec.pattern; if (pattern === 'random') pattern = pick(R, ['none', 'clean', 'gritty', 'drawn']);
-  const freeBands = [];
-  for (let i = 0; i < G.H.length - 1; i++) { const t = Y(i), b = Y(i + 1); if (!rects.some(o => o.t < b + 6 && o.b > t - 6)) freeBands.push([t, b]); }
+  // marking: one hand-drawn mark on one modest piece
   const marks = [];
-  if (pattern === 'drawn') {
-    const small = head.filter(o => o.r - o.l < FW * .55 && o.h < 260);
-    const target = small.length ? pick(R, small) : head.reduce((a, b) => (a.h < b.h ? a : b));
-    const kind = small.length ? pick(R, ['circle', 'circle', 'underline', 'scribble']) : 'underline', idx = pick(R, DRAWN[kind]);
-    const w = target.r - target.l, h = target.b - target.t;
-    if (kind === 'circle') marks.push({ idx, l: target.l - w * .14, t: target.t - h * .22, w: w * 1.28, h: h * 1.44 });
-    else if (kind === 'underline') marks.push({ idx, l: target.l - w * .04, t: target.base + h * .02, w: w * 1.08, h: Math.max(40, h * .35) });
-    else marks.push({ idx, l: target.l + w * .1, t: target.t + h * .1, w: w * .8, h: h * .8 });
+  const small = head.filter(o => o.r - o.l < FW * .55 && o.h < 260);
+  const target = small.length ? pick(R, small) : head.reduce((a, b) => (a.h < b.h ? a : b));
+  const kind = small.length ? pick(R, ['circle', 'circle', 'underline', 'scribble']) : 'underline', idx = pick(R, DRAWN[kind]);
+  const w = target.r - target.l, h = target.b - target.t;
+  if (kind === 'circle') marks.push({ idx, l: target.l - w * .14, t: target.t - h * .22, w: w * 1.28, h: h * 1.44 });
+  else if (kind === 'underline') marks.push({ idx, l: target.l - w * .04, t: target.base + h * .02, w: w * 1.08, h: Math.max(40, h * .35) });
+  else marks.push({ idx, l: target.l + w * .1, t: target.t + h * .1, w: w * .8, h: h * .8 });
+
+  return { head, info, symbol, grainy, grainyLogo, marks, strategy, flow, accentIdx: strategy.startsWith('repeat') ? head.length - 1 : randInt(R, 0, head.length - 1), fx: set.fx };
+}
+// image framing for a pair (pan stays inside the image so the frame never shows empty edges)
+function makeFx(R, meta) {
+  const keepFree = REC() && meta && meta.free;
+  const mang = meta && meta.dir != null ? meta.dir + Math.PI : (R() < .7 ? (R() < .5 ? 0 : Math.PI) + between(R, -.26, .26) : (R() < .5 ? -1 : 1) * Math.PI / 2 + between(R, -.17, .17));
+  return {
+    zoom: keepFree ? between(R, 1, 1.25) : between(R, 1, 1.7), px: R(), py: R(),
+    rot: keepFree ? 0 : (R() < .18 ? Math.PI : 0), skew: R() < (keepFree ? .2 : .4) ? (R() < .5 ? -1 : 1) * between(R, 10, 20) : 0,
+    contrast: between(R, 1.1, 1.6), mang,
+    blobs: [...Array(randInt(R, 3, 6))].map(() => ({ x: R(), y: between(R, .15, .9), r: between(R, .18, .5), v: between(R, .4, 1) })),
+    lab: pick(R, LAB), labIdx: randInt(R, 0, 3)
+  };
+}
+// draw img centred in a W×H context that is already translated to the centre (and rotated/skewed)
+function placeImg(x, img, fx, W, H) {
+  const z = fx.zoom * (fx.skew ? 1.25 : 1), sc = Math.max(W / img.width, H / img.height) * z, dw = img.width * sc, dh = img.height * sc;
+  const ox = W / (2 * dw) + fx.px * (1 - W / dw), oy = H / (2 * dh) + fx.py * (1 - H / dh);
+  x.drawImage(img, -dw * ox, -dh * oy, dw, dh);
+  return { dw, dh, ox, oy };
+}
+// editorial crop: the picture only fills a grid-snapped part of the frame (Problematic p86 "tight framing")
+function makeFrame(R, grid, force) {
+  const sel = $('frame').value, kind = force ? force : sel === 'random' ? (R() < .5 ? 'full' : R() < .5 ? 'box' : R() < .6 ? 'strip' : 'column') : sel;
+  if (kind === 'full') return { kind, l: 0, t: 0, r: FW, b: FH };
+  const V = grid.V.map(v => v * FW), H = grid.H.map(h => h * FH), span = (arr, lo, hi, minF, maxF, tot) => {
+    for (let k = 0; k < 40; k++) { const a = randInt(R, lo, hi - 1), b = randInt(R, a + 1, hi), f = (arr[b] - arr[a]) / tot; if (f >= minF && f <= maxF) return [arr[a], arr[b]]; }
+    return [arr[lo], arr[hi]];
+  };
+  if (kind === 'strip') { const [t, b] = span(H, 1, 12, .3, .5, FH); return { kind, l: 0, t, r: FW, b }; }
+  if (kind === 'column') { const [l, r] = span(V, 1, 11, .35, .55, FW); return { kind, l, t: 0, r, b: FH }; }
+  const [l, r] = span(V, 0, 12, .45, .8, FW), [t, b] = span(H, 0, 13, .35, .65, FH); return { kind, l, t, r, b };
+}
+function groundFor(set, v) {
+  if (treatOf(set, v) === 'duo') return paletteFor(set, v)[0];
+  return metaOf(set).tone === 'natural' ? '#E3E3E5' : '#000000';
+}
+// picture + frame composited: this is what sits behind the type
+function flatBg(set, v) {
+  const f = set.look.flat, key = 'F|' + [f.id, v.bg, v.pal].join('|');
+  if (BG.has(key)) return BG.get(key);
+  const c = document.createElement('canvas'); c.width = FW; c.height = FH; const x = c.getContext('2d');
+  if (v.bg === 'solid') x.fillStyle = v.pal === 'brw' ? f.solid : '#000000';
+  else {
+    const stops = v.pal === 'brw' ? f.grad : f.gradPt; let g;
+    if (f.radial) g = x.createRadialGradient(f.cx * FW, f.cy * FH, 0, f.cx * FW, f.cy * FH, FH * .9);
+    else { const dx = Math.cos(f.angle) * FW / 2, dy = Math.sin(f.angle) * FH / 2; g = x.createLinearGradient(FW / 2 - dx, FH / 2 - dy, FW / 2 + dx, FH / 2 + dy); }
+    stops.forEach((st, i) => g.addColorStop(i / (stops.length - 1), st)); x.fillStyle = g;
   }
-  const accentIdx = randInt(R, 0, head.length - 1);
-  return { head, info, logos, strategy, mode, logo, fontMode, pattern, freeBands, marks, accentIdx, accentLogo: R() < .5, patSeed: randInt(R, 1, 99999) };
+  x.fillRect(0, 0, FW, FH); BG.set(key, c); return c;
+}
+function composedBg(set, v) {
+  if (v.bg === 'solid' || v.bg === 'gradient') return flatBg(set, v);
+  const bg = heatBg(set, v), F = set.frame;
+  if (!F || F.kind === 'full') return bg;
+  const key = 'C|' + [REC(), treatOf(set, v), set.pair, v.id, v.pal, F.l, F.t, F.r, F.b, set.imgIdx, set.fx.px].join('|');
+  if (BG.has(key) && BG.get(key)._src === bg) return BG.get(key);
+  const c = document.createElement('canvas'); c.width = FW; c.height = FH; const x = c.getContext('2d');
+  x.fillStyle = groundFor(set, v); x.fillRect(0, 0, FW, FH);
+  x.save(); x.beginPath(); x.rect(F.l, F.t, F.r - F.l, F.b - F.t); x.clip(); x.drawImage(bg, 0, 0); x.restore();
+  c._src = bg; BG.set(key, c); return c;
+}
+// where the picture is busy (subject, edges) so type can avoid it; prompt's empty area counts as calm
+function busyMap(set) {
+  const W = 54, H = 68, img = imgOf(set), out = new Float32Array(W * H);
+  if (!img) return { W, H, d: out };
+  const c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d'), fx = set.fx, k = W / FW;
+  x.fillStyle = '#000'; x.fillRect(0, 0, W, H); x.filter = 'grayscale(1) blur(.6px)';
+  x.scale(k, k); x.translate(FW / 2, FH / 2); x.rotate(fx.rot); if (fx.skew) x.transform(1, 0, Math.tan(fx.skew * Math.PI / 180), 1, 0, 0);
+  const pl = placeImg(x, img, fx, FW, FH);
+  const d = x.getImageData(0, 0, W, H).data, g = i => d[i * 4];
+  let mean = 0; for (let i = 0; i < W * H; i++) mean += g(i); mean /= W * H;
+  let mx = 1e-6; const raw = new Float32Array(W * H);
+  for (let yy = 1; yy < H - 1; yy++) for (let xx = 1; xx < W - 1; xx++) { const i = yy * W + xx, e = Math.hypot(g(i + 1) - g(i - 1), g(i + W) - g(i - W)) + .6 * Math.abs(g(i) - mean); raw[i] = e; if (e > mx) mx = e; }
+  for (let yy = 1; yy < H - 1; yy++) for (let xx = 1; xx < W - 1; xx++) { let a = 0; for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) a += raw[(yy + dy) * W + xx + dx]; out[yy * W + xx] = a / 9 / mx; }
+  const f = metaOf(set).free;
+  if (f) {
+    // map the prompt's empty area (image coords) into the frame
+    let x0 = FW / 2 - pl.dw * pl.ox + f[0] * pl.dw, y0 = FH / 2 - pl.dh * pl.oy + f[1] * pl.dh, x1 = x0 + f[2] * pl.dw, y1 = y0 + f[3] * pl.dh;
+    if (fx.rot) [x0, x1, y0, y1] = [FW - x1, FW - x0, FH - y1, FH - y0];
+    for (let yy = 0; yy < H; yy++) for (let xx = 0; xx < W; xx++) { const X = xx / k, Y = yy / k; if (X >= x0 && X <= x1 && Y >= y0 && Y <= y1) out[yy * W + xx] *= .45; }
+  }
+  const F = set.frame;
+  if (F && F.kind !== 'full') for (let yy = 0; yy < H; yy++) for (let xx = 0; xx < W; xx++) { const X = xx / k, Y = yy / k; if (X < F.l || X > F.r || Y < F.t || Y > F.b) out[yy * W + xx] = 0; }
+  return { W, H, d: out };
+}
+function busyOf(set, rects) {
+  const B = set.busy; if (!B) return 0; let s = 0, n = 0;
+  rects.forEach(o => { for (let yy = Math.max(0, Math.floor(o.t / FH * B.H)); yy < Math.min(B.H, Math.ceil(o.b / FH * B.H)); yy++) for (let xx = Math.max(0, Math.floor(o.l / FW * B.W)); xx < Math.min(B.W, Math.ceil(o.r / FW * B.W)); xx++) { s += B.d[yy * B.W + xx]; n++; } });
+  return n ? s / n : 0;
+}
+// reading order: each next piece is either to the right of the previous one, or on a lower line and not entirely left of it
+function readingOrderOK(head) {
+  for (let i = 1; i < head.length; i++) {
+    const a = head[i - 1], b = head[i], aw = a.r - a.l;
+    const right = b.l >= a.r - 4;
+    const below = b.t >= a.t + .5 * Math.min(a.b - a.t, b.b - b.t) && b.r > a.l + .25 * aw;
+    if (!right && !below) return false;
+  }
+  return true;
+}
+const infoRect = t => ({ l: t.x, r: t.x + measure(t.txt, t.fs).w * t.s, t: t.base - t.fs * .7, b: t.base });
+// score: type on calm areas, readable info, clear hierarchy, follows the image's movement
+function scoreLayout(set, L) {
+  const hs = L.head.map(h => h.h), hier = Math.max(...hs) / hs.reduce((a, b) => a + b, 0);
+  let mom = 0; if (L.flow === 'vertical' && L.strategy === 'span') mom = .35; if ((L.flow === 'left' || L.flow === 'right') && (L.strategy === 'drop' || L.strategy === 'ref')) mom = .35;
+  const symB = L.symbol ? busyOf(set, [L.symbol]) : 0;
+  return 3 * (1 - busyOf(set, L.head)) + (1 - busyOf(set, L.info.map(infoRect))) + .4 * (1 - symB) + .6 * hier + mom - (L.strategy === 'fallback' ? 2 : 0);
 }
 function infoItem(txt, x, base, cap, right) { const fs = cap / .7, s = .6, w = measure(txt, fs).w * s; return { txt, fs, s, x: right ? x - w : x, base, font: 'NP', right: !!right, edge: x }; }
 
-/* ===== width families (for live text in Figma) ===== */
-const FAMS = [
-  { id: 'NPW', file: 'NeuePlak-WideSemiBold.ttf', name: 'Neue Plak Wide SemiBold' },
-  { id: 'NPE', file: 'NeuePlak-ExtendedSemiBold.ttf', name: 'Neue Plak Extended SemiBold' },
-  { id: 'NP', file: 'NeuePlak-SemiBold.ttf', name: 'Neue Plak SemiBold' },
-  { id: 'NPN', file: 'NeuePlak-NarrowSemiBold.ttf', name: 'Neue Plak Narrow SemiBold' },
-  { id: 'NPC', file: 'NeuePlak-CondensedSemiBold.ttf', name: 'Neue Plak Condensed SemiBold' },
-  { id: 'NPX', file: 'NeuePlak-CompressedSemiBold.ttf', name: 'Neue Plak Compressed SemiBold' }
-];
-const FAMNAME = Object.fromEntries(FAMS.map(f => [f.id, f.name])); FAMNAME.MAD = 'MAD Sans Fill'; FAMNAME.MADB = 'MAD Sans Fill';
-function calibrateFamilies() {
-  const probe = 'black friday. UP TO 40% OFF 11.12', base = measure(probe, 100, 'NP');
-  FAMS.filter(f => FONT_OK[f.id]).forEach(f => { const m = measure(probe, 100, f.id); f.ratio = m.w / base.w; f.asc = measure('bkfdh', 100, f.id).a / measure('bkfdh', 100, 'NP').a; });
+/* ===== heat rendering ===== */
+let POOL = []; // loaded HTMLImageElements
+function lut(pal) { const rgb = pal.map(rgbOf), out = new Uint8Array(768); for (let v = 0; v < 256; v++) { const t = v / 255 * (rgb.length - 1), i = Math.min(rgb.length - 2, Math.floor(t)), f = t - i; for (let k = 0; k < 3; k++) out[v * 3 + k] = rgb[i][k] + (rgb[i + 1][k] - rgb[i][k]) * f; } return out; }
+let META = [];
+const imgOf = set => (PRESET().images && POOL.length) ? POOL[set.imgIdx % POOL.length] : null;
+const metaOf = set => (PRESET().images && POOL.length && META[set.imgIdx % POOL.length]) || { tone: 'natural', dir: null, free: null };
+const REC = () => $('mode').value === 'recipe';
+// the 4 recipes: each piece gets the treatment that suits it
+// a pair's "look" (treatment, ground, grainy symbol, halftone, tone-on-tone) is random and independent of its colour
+function makeLook(R, meta) {
+  // A: brand-only solids & gradients (black · red · white · cool greys); point looks stay black-based
+  const flat = { id: Math.floor(R() * 1e9), solid: pick(R, ['#000000', '#000000', RED, '#14141E']),
+    grad: pick(R, [['#000000', RED], [RED, '#000000'], ['#14141E', RED, '#000000'], ['#000000', '#282832'], [RED, '#5c000b']]),
+    gradPt: pick(R, [['#000000', '#282832'], ['#000000', '#14141E', '#282832'], ['#14141E', '#000000']]),
+    angle: between(R, 0, Math.PI), radial: R() < .3, cx: between(R, .25, .75), cy: between(R, .2, .8) };
+  const nat = meta.tone === 'natural', treat = R() < (nat ? .7 : meta.tone === 'thermal' ? .15 : .45) ? 'natural' : 'duo';
+  return { flat, treat, ground: treat === 'duo' && nat && R() < .25 ? 'light' : 'dark', grainy: R() < .6, halftone: treat === 'duo' && R() < .45, tone: meta.tone === 'red' && R() < .6 };
 }
-// same item, but set in the nearest real width family with no horizontal scaling
-function liveItem(it) {
-  if (it.font === 'MAD' || it.font === 'MADB') { const w = measure(it.txt, it.fs, it.font).w; return { ...it, s: 1, x: it.right ? it.edge - w : it.x }; }
-  const f = FAMS.filter(f => FONT_OK[f.id]).reduce((a, b) => Math.abs(Math.log(b.ratio / it.s)) < Math.abs(Math.log(a.ratio / it.s)) ? b : a);
-  const fs = it.fs / f.asc, w = measure(it.txt, fs, f.id).w;
-  return { ...it, font: f.id, fs, s: 1, x: it.right ? it.edge - w : it.x };
+function recipe(set, v) {
+  if ($('preset').value !== 'B') return { treat: 'natural', ground: 'dark', halftone: false, grainy: false, tone: false };
+  const L = set.look || { treat: 'natural', ground: 'dark', grainy: true, halftone: false, tone: false };
+  return { treat: L.treat, ground: L.ground, halftone: v.bg === 'grain' && L.halftone, grainy: v.bg === 'grain' && L.grainy, tone: L.tone };
 }
-const PREVIEW = () => document.getElementById('preview').value;
+// the slot (01–04) only fixes image vs grain; the colour comes from the pair
+const palOf = sub => sub.color === 'brw' ? 'brw' : $('point').value;
+const effV = (sub, v) => ({ ...v, pal: palOf(sub), label: `${CNAME[palOf(sub)]} · ${v.bg === 'image' ? '이미지' : '그레인'}` });
+const treatOf = (set, v) => REC() ? recipe(set, v).treat : ($('treat').value === 'random' ? set.treatR : $('treat').value);
+const groundOf = (set, v) => REC() ? recipe(set, v).ground : ($('ground').value === 'random' ? set.groundR : $('ground').value);
+const halftoneOf = (set, v) => REC() ? recipe(set, v).halftone : $('halftone').checked;
+const grainyOf = (set, v) => REC() ? recipe(set, v).grainy : set.layout.grainyLogo;
+const toneOf = (set, v) => REC() ? recipe(set, v).tone : $('tone').checked;
+function paletteFor(set, v) { const fx = set.layout.fx; if ($('lab').checked && v.pal !== 'brw') return fx.lab; return PAL[v.pal][groundOf(set, v)]; }
+// grayscale "heat field" at half resolution: the source photo (or procedural blobs) blurred and contrast-pushed
+function heatField(set) {
+  const W = FW / 2, H = FH / 2, c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d');
+  const fx = set.layout.fx, blur = +$('blur').value;
+  x.fillStyle = '#000'; x.fillRect(0, 0, W, H);
+  const img = imgOf(set);
+  x.save();
+  x.filter = `grayscale(1) contrast(${fx.contrast}) blur(${blur / 2}px)`;
+  x.translate(W / 2, H / 2); x.rotate(fx.rot); if (fx.skew) x.transform(1, 0, Math.tan(fx.skew * Math.PI / 180), 1, 0, 0);
+  if (img) {
+    placeImg(x, img, fx, W, H);
+  } else {
+    // placeholder only (no image yet): a single soft glow so the layout can be judged
+    x.translate(-W / 2, -H / 2);
+    const b = fx.blobs[0], g = x.createRadialGradient(b.x * W, b.y * H, 0, b.x * W, b.y * H, W * .9);
+    g.addColorStop(0, 'rgb(150,150,150)'); g.addColorStop(.55, 'rgb(40,40,40)'); g.addColorStop(1, 'rgb(0,0,0)'); x.fillStyle = g; x.fillRect(0, 0, W, H);
+  }
+  x.restore();
+  // polarity: the body is always the bright ("hot") part, whether the photo has a light or dark background
+  let id = x.getImageData(0, 0, W, H), d = id.data, sum = 0;
+  for (let i = 0; i < d.length; i += 4) sum += d[i];
+  const flip = img && sum / (W * H) > 128;
+  if (flip) { for (let i = 0; i < d.length; i += 4) d[i] = d[i + 1] = d[i + 2] = 255 - d[i]; x.putImageData(id, 0, 0); }
+  // long exposure: drag the bright body into ghost trails along this set's direction
+  const mo = +$('motion').value;
+  if (mo > 0) {
+    const t = document.createElement('canvas'); t.width = W; t.height = H; t.getContext('2d').drawImage(c, 0, 0);
+    x.globalCompositeOperation = 'lighten';
+    const n = 16, len = mo / 100 * W * .35;
+    for (let k = 1; k <= n; k++) { const f = k / n; x.globalAlpha = (1 - f) * .6; x.drawImage(t, Math.cos(fx.mang) * len * f, Math.sin(fx.mang) * len * f); }
+    x.globalAlpha = 1; x.globalCompositeOperation = 'source-over';
+  }
+  id = x.getImageData(0, 0, W, H); d = id.data;
+  // auto levels: stretch the 2–98% range so dark photos (night, orange light) still have a full heat range
+  const hist = new Uint32Array(256); for (let i = 0; i < d.length; i += 4) hist[d[i]]++;
+  const tot = d.length / 4; let lo = 0, hi = 255, acc = 0;
+  for (let v = 0; v < 256; v++) { acc += hist[v]; if (acc > tot * .02) { lo = v; break; } }
+  acc = 0; for (let v = 255; v >= 0; v--) { acc += hist[v]; if (acc > tot * .02) { hi = v; break; } }
+  const span = Math.max(24, hi - lo);
+  const bands = +$('band').value, gamma = POOL.length ? +$('expo').value / 100 : 1;
+  for (let i = 0; i < d.length; i += 4) {
+    let v = img ? Math.max(0, Math.min(255, (d[i] - lo) * 255 / span)) : d[i];
+    v = 255 * Math.pow(v / 255, gamma);
+    if (bands >= 2 && POOL.length) v = Math.round(Math.round(v / 255 * (bands - 1)) / (bands - 1) * 255);
+    d[i] = d[i + 1] = d[i + 2] = v;
+  }
+  x.putImageData(id, 0, 0);
+  return c;
+}
+const BG = new Map();
+const bgSeed = set => Math.round(set.fx.px * 1e6) + set.imgIdx * 7;
+function heatBg(set, v) {
+  const fieldKey = [$('blur').value, $('band').value, $('expo').value, $('motion').value, POOL.length, set.imgIdx, set.fx.zoom, set.fx.px].join('|');
+  const key = [REC(), treatOf(set, v), set.pair, v.id, v.pal, groundOf(set, v), halftoneOf(set, v), $('glitch').value, $('lab').checked, fieldKey].join('|');
+  if (BG.has(key)) return BG.get(key);
+  if (treatOf(set, v) === 'natural') { const out = naturalBg(set, v); finishBg(set, out); BG.set(key, out); if (BG.size > 80) BG.delete(BG.keys().next().value); return out; }
+  if (!set._field || set._fieldKey !== fieldKey) { set._field = heatField(set); set._fieldKey = fieldKey; }
+  const out = document.createElement('canvas'); out.width = FW; out.height = FH; const o = out.getContext('2d');
+  o.imageSmoothingQuality = 'high'; o.drawImage(set._field, 0, 0, FW, FH);
+  const id = o.getImageData(0, 0, FW, FH), d = id.data, L = lut(paletteFor(set, v)), R = mulberry32(bgSeed(set) + 99);
+  const base = rgbOf(paletteFor(set, v)[0]);
+  for (let i = 0; i < d.length; i += 4) {
+    const g = d[i];
+    if (v.bg === 'grain') {
+      // the image melts into particles: brighter = denser dots
+      const p = Math.pow(g / 255, 1.6) * 1.1;
+      if (R() < p) { d[i] = L[g * 3]; d[i + 1] = L[g * 3 + 1]; d[i + 2] = L[g * 3 + 2]; } else { d[i] = base[0]; d[i + 1] = base[1]; d[i + 2] = base[2]; }
+    } else { d[i] = L[g * 3]; d[i + 1] = L[g * 3 + 1]; d[i + 2] = L[g * 3 + 2]; }
+  }
+  o.putImageData(id, 0, 0);
+  if (v.bg === 'grain' && halftoneOf(set, v)) {
+    // halftone: dot size follows heat, like a printed poster
+    const src = document.createElement('canvas'); src.width = FW; src.height = FH; src.getContext('2d').drawImage(set._field, 0, 0, FW, FH);
+    const sd = src.getContext('2d').getImageData(0, 0, FW, FH).data, cell = 8;
+    o.fillStyle = paletteFor(set, v)[0]; o.fillRect(0, 0, FW, FH);
+    for (let yy = 0; yy < FH; yy += cell) for (let xx = (yy / cell % 2) * cell / 2; xx < FW; xx += cell) {
+      const g = sd[((yy + cell / 2 | 0) * FW + (xx + cell / 2 | 0)) * 4] || 0, r = Math.sqrt(g / 255) * cell * .62;
+      if (r < .4) continue; o.fillStyle = `rgb(${L[g * 3]},${L[g * 3 + 1]},${L[g * 3 + 2]})`; o.beginPath(); o.arc(xx + cell / 2, yy + cell / 2, r, 0, 6.2832); o.fill();
+    }
+  }
+  finishBg(set, out);
+  BG.set(key, out); if (BG.size > 80) BG.delete(BG.keys().next().value);
+  return out;
+}
+// dissonance: horizontal slice displacement (shared by both treatments)
+function finishBg(set, out) {
+  const o = out.getContext('2d'), R = mulberry32(bgSeed(set) + 7), gl = +$('glitch').value;
+  if (gl <= 0) return;
+  const tmp = document.createElement('canvas'); tmp.width = FW; tmp.height = FH; tmp.getContext('2d').drawImage(out, 0, 0);
+  const n = Math.round(gl / 6);
+  for (let k = 0; k < n; k++) { const y = R() * FH, h = 6 + R() * 60 * gl / 100, dx = (R() - .5) * 140 * gl / 100; o.drawImage(tmp, 0, y, FW, h, dx, y, FW, h); }
+}
+// Frame 5 look: keep the photo's own colour, light grade, optional extra ghosting
+function naturalBg(set, v) {
+  const out = document.createElement('canvas'); out.width = FW; out.height = FH; const o = out.getContext('2d');
+  const fx = set.layout.fx, img = imgOf(set);
+  if (!img) { const g = o.createLinearGradient(0, 0, 0, FH); g.addColorStop(0, '#d9d9d6'); g.addColorStop(1, '#9a9a96'); o.fillStyle = g; o.fillRect(0, 0, FW, FH); return out; }
+  o.fillStyle = '#000'; o.fillRect(0, 0, FW, FH);
+  o.save();
+  o.filter = `saturate(.88) contrast(1.05) blur(${+$('blur').value / 6}px)`;
+  o.translate(FW / 2, FH / 2); o.rotate(fx.rot); if (fx.skew) o.transform(1, 0, Math.tan(fx.skew * Math.PI / 180), 1, 0, 0);
+  placeImg(o, img, fx, FW, FH);
+  o.restore();
+  const mo = +$('motion').value;
+  if (mo > 0) {
+    const t = document.createElement('canvas'); t.width = FW; t.height = FH; t.getContext('2d').drawImage(out, 0, 0);
+    const n = 10, len = mo / 100 * FW * .18;
+    for (let k = 1; k <= n; k++) { const f = k / n; o.globalAlpha = (1 - f) * .22; o.drawImage(t, Math.cos(fx.mang) * len * f, Math.sin(fx.mang) * len * f); }
+    o.globalAlpha = 1;
+  }
+  if (v.bg === 'grain') {
+    // the photo dissolves into grain on paper: denser where there is more "ink"
+    const id = o.getImageData(0, 0, FW, FH), d = id.data, R = mulberry32(bgSeed(set) + 99);
+    let sum = 0; for (let i = 0; i < d.length; i += 16) sum += d[i] * .3 + d[i + 1] * .59 + d[i + 2] * .11;
+    const light = sum / (d.length / 16) > 128, paper = rgbOf(light ? '#E3E3E5' : '#000000');
+    for (let i = 0; i < d.length; i += 4) {
+      const l = (d[i] * .3 + d[i + 1] * .59 + d[i + 2] * .11) / 255, ink = light ? 1 - l : l;
+      if (!(R() < Math.pow(ink, .75) * 1.25)) { d[i] = paper[0]; d[i + 1] = paper[1]; d[i + 2] = paper[2]; }
+    }
+    o.putImageData(id, 0, 0);
+  }
+  return out;
+}
+function avgUnder(canvas, rects) {
+  const k = .1, s = document.createElement('canvas'); s.width = FW * k; s.height = FH * k; const x = s.getContext('2d'); x.drawImage(canvas, 0, 0, s.width, s.height);
+  const d = x.getImageData(0, 0, s.width, s.height).data; let r = 0, g = 0, b = 0, n = 0;
+  rects.forEach(o => { for (let yy = Math.max(0, Math.floor(o.t * k)); yy < Math.min(s.height, Math.ceil(o.b * k)); yy++) for (let xx = Math.max(0, Math.floor(o.l * k)); xx < Math.min(s.width, Math.ceil(o.r * k)); xx++) { const i = (yy * s.width + xx) * 4; r += d[i]; g += d[i + 1]; b += d[i + 2]; n++; } });
+  return n ? hex([r / n, g / n, b / n]) : '#000000';
+}
+function colorsFor(set, v, bg) {
+  const L = set.layout, pal = paletteFor(set, v);
+  const accentBase = v.pal !== 'brw' && $('lab').checked && treatOf(set, v) !== 'natural' ? pal[Math.floor(pal.length / 2)] : ACC[v.pal];
+  const under = avgUnder(bg, L.head), dark = contrast(under, '#ffffff') >= contrast(under, '#000000');
+  const type = dark ? '#ffffff' : '#000000';
+  const accent = contrast(under, accentBase) >= 2.2 ? accentBase : type;
+  const infoBg = avgUnder(bg, L.info.map(t => ({ l: t.x, r: t.x + measure(t.txt, t.fs).w * t.s, t: t.base - t.fs * .7, b: t.base })));
+  const info = contrast(infoBg, '#ffffff') >= contrast(infoBg, '#000000') ? '#ffffff' : '#000000';
+  // tone-on-tone: one piece takes the colour of the background under it, a step darker (or lighter on dark)
+  let toneIdx = -1, toneCol = null;
+  if (toneOf(set, v) && L.head.length > 1) {
+    toneIdx = L.head.findIndex((h, i) => i !== L.accentIdx && i === L.head.length - 1); if (toneIdx < 0) toneIdx = L.head.findIndex((h, i) => i !== L.accentIdx);
+    const u = avgUnder(bg, [L.head[toneIdx]]), c = rgbOf(u), lumU = lum(u);
+    // same hue as the background, but never so close that the required copy disappears (contrast >= 1.7)
+    const dark = lumU > .18;
+    for (let k = .25; k <= 1; k += .05) { toneCol = dark ? hex(c.map(x => x * (1 - k))) : hex(c.map(x => x + (255 - x) * k)); if (contrast(toneCol, u) >= 1.7) break; }
+  }
+  // each headline piece picks black or white for what is under IT (bright photos often mix light and dark areas)
+  const pc = L.head.map((h, i) => {
+    if (i === toneIdx) return toneCol;
+    const u = avgUnder(bg, [h]), t = contrast(u, '#ffffff') >= contrast(u, '#000000') ? '#ffffff' : '#000000';
+    return i === L.accentIdx && contrast(u, accentBase) >= 2.2 ? accentBase : t;
+  });
+  return { type, accent, info, logo: L.accentIdx % 2 ? accent : type, toneIdx, toneCol, pc };
+}
+
+/* ===== guideline audit (checks the rendered result) ===== */
+const rgbLum = (r, g, b) => { const f = v => { v /= 255; return v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); }; return .2126 * f(r) + .7152 * f(g) + .0722 * f(b); };
+const satOf = h => { const [r, g, b] = rgbOf(h), mx = Math.max(r, g, b), mn = Math.min(r, g, b); return mx ? (mx - mn) / mx : 0; };
+const hueOf = h => { const [r, g, b] = rgbOf(h).map(x => x / 255), mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn; if (!d) return 0; let hh = mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; return (hh * 60 + 360) % 360; };
+const nearCol = (a, b) => { const x = rgbOf(a), y = rgbOf(b); return Math.hypot(x[0] - y[0], x[1] - y[1], x[2] - y[2]) < 48; };
+const overlap = (a, b) => a.l < b.r && a.r > b.l && a.t < b.b && a.b > b.t;
+function auditCard(set, v) {
+  const L = set.layout, out = [], add = (lv, msg) => out.push({ lv, msg });
+  const bg = composedBg(set, v), col = colorsFor(set, v, bg), grainy = v.bg === 'grain' && grainyOf(set, v);
+  // quarter-size picture of everything behind the type
+  const k = .25, W = FW * k, H = FH * k, c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d');
+  x.drawImage(bg, 0, 0, W, H);
+  if (grainy) { const g = L.grainy, gh = g.w * 826 / 1600; x.globalAlpha = .7; x.filter = 'blur(2px)'; x.drawImage(tinted(HBL, col.accent !== col.type ? col.accent : '#ffffff', g.w * k, gh * k), g.l * k, g.t * k); x.globalAlpha = 1; x.filter = 'none'; }
+  const D = x.getImageData(0, 0, W, H).data;
+  // contrast of a colour against the worst 15% of pixels under a box
+  const cAt = (r, color) => { const tl = lum(color), vals = []; for (let yy = Math.max(0, Math.floor(r.t * k)); yy < Math.min(H, Math.ceil(r.b * k)); yy++) for (let xx = Math.max(0, Math.floor(r.l * k)); xx < Math.min(W, Math.ceil(r.r * k)); xx++) { const i = (yy * W + xx) * 4, pl = rgbLum(D[i], D[i + 1], D[i + 2]); vals.push((Math.max(tl, pl) + .05) / (Math.min(tl, pl) + .05)); } if (!vals.length) return 21; vals.sort((a, b) => a - b); return vals[Math.floor(vals.length * .15)]; };
+  // 1. legibility (WCAG: large text 3:1, small text 4.5:1; tone-on-tone piece is intentionally soft)
+  L.head.forEach((h, i) => {
+    const isTone = i === col.toneIdx, color = col.pc[i], r = cAt(h, color), need = isTone ? 1.7 : 3;
+    if (r < need * .67) add('fail', `"${h.txt}" 가독성 낮음 (${r.toFixed(1)}:1)`); else if (r < need) add('warn', `"${h.txt}" 대비 약함 (${r.toFixed(1)}:1)`);
+  });
+  const ir = L.info.map(infoRect), ic = Math.min(...ir.map(r => cAt(r, col.info)));
+  if (ic < 3) add('fail', `정보 글자 가독성 낮음 (${ic.toFixed(1)}:1)`); else if (ic < 4.5) add('warn', `정보 글자 대비 약함 (${ic.toFixed(1)}:1, 권장 4.5)`);
+  const showSym = !!L.symbol;
+  if (showSym) { const lc = cAt(L.symbol, col.logo); if (lc < 2) add('fail', `로고가 배경에 묻혀요 (${lc.toFixed(1)}:1)`); else if (lc < 3) add('warn', `로고 대비 약함 (${lc.toFixed(1)}:1)`); }
+  // 2. overlaps
+  if ($('marks').checked) L.marks.forEach(m => { const mr = { l: m.l, r: m.l + m.w, t: m.t, b: m.t + m.h }; if (ir.some(r => overlap(mr, r))) add('fail', '손그림이 정보 글자와 겹쳐요'); if (showSym && overlap(mr, L.symbol)) add('warn', '손그림이 로고와 겹쳐요'); });
+  // 3. type over the subject
+  const hb = busyOf(set, L.head); if (hb > .5) add('warn', `헤드라인이 피사체·디테일 위에 있어요 (${Math.round(hb * 100)}%)`);
+  // 4. 2023 (PTH) elements in a 2025 system piece
+  if (L.head.some(h => h.font === 'MAD')) add('warn', 'MAD Sans는 2023 캠페인 서체예요 (2025 시스템은 Neue Plak)');
+  // 5. colours: at most 2 supporting colours (Problematic p84); logo in brand colours
+  const used = [...col.pc, col.info, showSym ? col.logo : null, col.toneIdx >= 0 ? col.toneCol : null].filter(Boolean);
+  const supp = new Set(used.filter(cc => satOf(cc) > .25 && !nearCol(cc, RED)).map(cc => Math.round(hueOf(cc) / 30)));
+  if ($('lab').checked && treatOf(set, v) === 'duo' && v.pal !== 'brw') supp.add('lab');
+  if (supp.size > 2) add('fail', '포인트 컬러가 2개를 넘어요 (p84)');
+  if (showSym && ![ '#ffffff', '#000000', RED, ACC[v.pal] ].some(cc => nearCol(cc, col.logo)) && !(col.toneIdx >= 0)) add('warn', '로고 색이 브랜드 컬러가 아니에요');
+  // reading order
+  if (!readingOrderOK(L.strategy === 'span' ? L.head.slice().reverse() : L.head)) add('fail', '헤드라인 읽는 순서가 깨졌어요 (black → friday.)');
+  // 6. required copy
+  const ht = L.head.map(h => h.txt).join('').replace(/\s/g, ''), it = L.info.map(t => t.txt).join(' ');
+  if (!ht.includes('blackfriday')) add('fail', 'black friday. 문구가 빠졌어요');
+  if (!it.includes('UP TO 40% OFF') || !it.includes('11.12 — 11.22')) add('fail', '필수 정보(할인·기간)가 빠졌어요');
+  // 7. logo rules (centred, >= 100px, never cropped); grainy symbol counts as the campaign exception
+  if (!showSym) add('fail', grainy ? '그레이니 심볼은 배경일 뿐이에요. 솔리드 하트비트가 따로 필요해요 (가이드 p72)' : '하트비트 심볼이 없어요');
+  if (showSym) { const S = L.symbol; if (Math.abs((S.l + S.r) / 2 - FW / 2) > 2) add('fail', '심볼이 가로 중앙이 아니에요'); if (S.r - S.l < 100) add('fail', '심볼이 최소 크기(100px)보다 작아요'); if (S.l < 0 || S.r > FW || S.t < 0 || S.b > FH) add('fail', '심볼이 잘렸어요'); }
+  // 8. hierarchy: discount never louder than the headline
+  const hero = Math.max(...L.head.map(h => h.h)); if (L.info.some(t => t.fs * .7 > hero / 3 + 1)) add('warn', '정보 글자가 너무 커요 (할인율 강조 금지)');
+  return { issues: out, level: out.some(i => i.lv === 'fail') ? 'fail' : out.length ? 'warn' : 'pass' };
+}
+const auditPair = sub => VARIANTS.map(v => auditCard(viewOf(sub, v), effV(sub, v)));
+const okLevel = (res, mode) => mode === 'show' || (mode === 'nofail' ? res.every(r => r.level !== 'fail') : res.every(r => r.level === 'pass'));
 
 /* ===== drawing ===== */
+let HB, HBL, MARKS = {}, NOISE;
 function tinted(img, color, w, h) { const c = document.createElement('canvas'); c.width = Math.max(1, Math.ceil(w)); c.height = Math.max(1, Math.ceil(h)); const x = c.getContext('2d'); x.drawImage(img, 0, 0, c.width, c.height); x.globalCompositeOperation = 'source-in'; x.fillStyle = color; x.fillRect(0, 0, c.width, c.height); return c; }
-function paletteLUT(pal) { const rgb = pal.map(rgbOf), out = new Uint8Array(768); for (let v = 0; v < 256; v++) { const t = v / 255 * (rgb.length - 1), i = Math.min(rgb.length - 2, Math.floor(t)), f = t - i; for (let k = 0; k < 3; k++) out[v * 3 + k] = rgb[i][k] + (rgb[i + 1][k] - rgb[i][k]) * f; } return out; }
-function drawBg(ctx, c) {
-  const bg = c.bg;
-  if (bg.type === 'solid') { ctx.fillStyle = bg.c; ctx.fillRect(0, 0, FW, FH); return; }
-  if (bg.type === 'grad' || bg.type === 'radial') {
-    let g;
-    if (bg.type === 'grad') { const dx = Math.cos(bg.angle) * FW / 2, dy = Math.sin(bg.angle) * FH / 2; g = ctx.createLinearGradient(FW / 2 - dx, FH / 2 - dy, FW / 2 + dx, FH / 2 + dy); }
-    else g = ctx.createRadialGradient(bg.cx * FW, bg.cy * FH, 0, bg.cx * FW, bg.cy * FH, FH * .85);
-    bg.stops.forEach((s, i) => g.addColorStop(i / (bg.stops.length - 1), s));
-    ctx.fillStyle = g; ctx.fillRect(0, 0, FW, FH); return;
-  }
-  const w = 108, h = 135, s = document.createElement('canvas'); s.width = w; s.height = h; const x = s.getContext('2d');
-  x.fillStyle = '#000'; x.fillRect(0, 0, w, h); x.globalCompositeOperation = 'lighter';
-  bg.blobs.forEach(b => { const g = x.createRadialGradient(b.x * w, b.y * h, 0, b.x * w, b.y * h, b.r * w * 1.4), v = Math.round(b.v * 200); g.addColorStop(0, `rgb(${v},${v},${v})`); g.addColorStop(1, 'rgb(0,0,0)'); x.fillStyle = g; x.fillRect(0, 0, w, h); });
-  const id = x.getImageData(0, 0, w, h), lut = paletteLUT(bg.pal);
-  for (let i = 0; i < id.data.length; i += 4) { const v = Math.min(255, id.data[i]); id.data[i] = lut[v * 3]; id.data[i + 1] = lut[v * 3 + 1]; id.data[i + 2] = lut[v * 3 + 2]; }
-  x.globalCompositeOperation = 'source-over'; x.putImageData(id, 0, 0);
-  ctx.save(); ctx.filter = 'blur(28px)'; ctx.drawImage(s, -60, -60, FW + 120, FH + 120); ctx.restore();
+function drawGrainySymbol(ctx, g, color, seed) {
+  const h = g.w * 826 / 1600, c = document.createElement('canvas'); c.width = FW; c.height = FH; const x = c.getContext('2d');
+  x.filter = `blur(${Math.round(g.w * .03)}px)`; x.drawImage(tinted(HBL, color, g.w, h), g.l, g.t); x.filter = 'none';
+  const id = x.getImageData(0, 0, FW, FH), d = id.data, R = mulberry32(seed);
+  for (let i = 0; i < d.length; i += 4) { const a = d[i + 3] / 255; d[i + 3] = a > 0 && R() < a * a * 1.15 ? 255 : 0; }
+  x.putImageData(id, 0, 0); ctx.drawImage(c, 0, 0);
 }
-function dither(canvas, R, power = 2, gain = 1.15) {
-  const x = canvas.getContext('2d'), id = x.getImageData(0, 0, canvas.width, canvas.height), d = id.data;
-  for (let i = 0; i < d.length; i += 4) { const a = d[i + 3] / 255; if (a > 0 && R() < Math.pow(a, power) * gain) d[i + 3] = 255; else d[i + 3] = 0; }
-  x.putImageData(id, 0, 0);
-}
-function drawGrainySymbol(ctx, L, color, seed) {
-  const w = L.w, h = w * 826 / 1600, c = document.createElement('canvas'); c.width = FW; c.height = FH; const x = c.getContext('2d');
-  x.filter = `blur(${Math.round(w * .03)}px)`; x.drawImage(tinted(HBL, color, w, h), L.l, L.t); x.filter = 'none';
-  dither(c, mulberry32(seed)); ctx.drawImage(c, 0, 0);
-}
-// repeating typography texture (guide p56–57)
-function patternCanvas(spec, gritty) {
-  const c = document.createElement('canvas'); c.width = FW; c.height = FH; const x = c.getContext('2d');
-  const R = mulberry32(spec.layout.patSeed), cw = 150, ch = 128, ox = -cw * .55, fs = 17;
-  const phrases = [['BLACK', 'FRIDAY', '2026'], ['UP TO 40%', 'OFF', '11.12 — 11.22'], ['BLACK FRIDAY', 'EVERY', 'ATHLETE']];
-  x.fillStyle = '#fff'; x.textBaseline = 'alphabetic';
-  for (let row = 0; row * ch < FH + ch; row++) for (let col = 0; col * cw + ox < FW + cw; col++) {
-    const px = ox + col * cw + (row % 2) * cw * 0, py = row * ch;
-    if (row % 2 === 0) { x.drawImage(HB, px + 6, py + 18, 34, 34 * 413 / 800); const ph = phrases[(col + row) % phrases.length]; x.font = `${fs}px NP`; ph.forEach((t, k) => { x.save(); x.translate(px + 6, py + 62 + k * (fs + 1)); x.scale(.75, 1); x.fillText(t, 0, 0); x.restore(); }); }
-    else { x.font = `${fs}px NP`; [BRAND.w1, BRAND.w2, BRAND.tag].forEach((t, k) => { x.save(); x.translate(px + 6, py + 34 + k * (fs + 1)); x.scale(.75, 1); x.fillText(t, 0, 0); x.restore(); }); }
-  }
-  if (!gritty) return c;
-  // gritty: slice-shift + ghost + grain dither
-  const g = document.createElement('canvas'); g.width = FW; g.height = FH; const gx = g.getContext('2d');
-  for (let y = 0; y < FH; y += 5) { const dx = (R() - .5) * 10; gx.drawImage(c, 0, y, FW, 5, dx, y + (R() - .5) * 3, FW, 5); }
-  gx.globalAlpha = .5; gx.drawImage(c, 4, -3); gx.globalAlpha = 1;
-  const b = document.createElement('canvas'); b.width = FW; b.height = FH; const bx = b.getContext('2d'); bx.filter = 'blur(1.4px)'; bx.drawImage(g, 0, 0);
-  dither(b, R, 1.4, 1.1); return b;
-}
-function drawPattern(ctx, spec) {
-  const L = spec.layout, c = spec.colors; if (L.pattern !== 'clean' && L.pattern !== 'gritty') return;
-  const tone = c.tone || '#000000', col = lum(tone) > .35 ? mix(tone, '#000000', .16) : mix(tone, '#ffffff', .13);
-  const pat = tinted(patternCanvas(spec, L.pattern === 'gritty'), c.mode === 'uagrad' || c.mode === 'thermal' || c.mode === 'gradient' ? (lum(tone) > .35 ? '#000000' : '#ffffff') : col, FW, FH);
-  ctx.save();
-  if (spec.zone === 'free') { ctx.beginPath(); L.freeBands.forEach(([t, b]) => ctx.rect(0, t, FW, b - t)); ctx.clip(); }
-  ctx.globalAlpha = c.mode === 'uagrad' || c.mode === 'thermal' || c.mode === 'gradient' ? .14 : 1;
-  ctx.drawImage(pat, 0, 0); ctx.restore();
-}
-function drawText(ctx, it, color) { if (PREVIEW() === 'family') it = liveItem(it); ctx.save(); ctx.fillStyle = color; ctx.font = `${it.fs}px ${it.font || 'NP'}`; ctx.textBaseline = 'alphabetic'; ctx.translate(it.x, it.base); ctx.scale(it.s, 1); ctx.fillText(it.txt, 0, 0); ctx.restore(); }
+function drawText(ctx, it, color) { if ($('preview').value === 'family') it = liveItem(it); ctx.save(); ctx.fillStyle = color; ctx.font = `${it.fs}px ${it.font || 'NP'}`; ctx.translate(it.x, it.base); ctx.scale(it.s, 1); ctx.fillText(it.txt, 0, 0); ctx.restore(); }
 function drawGrain(ctx, amt) { if (!amt) return; ctx.save(); ctx.globalAlpha = amt / 100 * .16; ctx.drawImage(NOISE, 0, 0); ctx.globalAlpha = amt / 100 * .45; ctx.globalCompositeOperation = 'overlay'; ctx.drawImage(NOISE, 0, 0); ctx.restore(); }
 function drawGrid(ctx, G) { ctx.save(); ctx.strokeStyle = 'rgba(255,255,255,.6)'; ctx.lineWidth = 2; ctx.globalCompositeOperation = 'difference'; G.V.forEach(v => { ctx.beginPath(); ctx.moveTo(v * FW, 0); ctx.lineTo(v * FW, FH); ctx.stroke(); }); G.H.forEach(h => { ctx.beginPath(); ctx.moveTo(0, h * FH); ctx.lineTo(FW, h * FH); ctx.stroke(); }); ctx.restore(); }
-function logoColorOf(spec) { const c = spec.colors; return spec.layout.accentLogo ? c.accent : c.type; }
-function drawBackLayer(ctx, spec, grain) {
-  const L = spec.layout, c = spec.colors;
-  drawBg(ctx, c); drawPattern(ctx, spec);
-  // grainy symbol sits behind the type: pull it toward the background so the headline still reads
-  const gc = c.accent !== c.type ? c.accent : c.type;
-  L.logos.filter(l => l.kind === 'grainy').forEach(l => drawGrainySymbol(ctx, l, mix(c.tone || '#000000', gc, .55), spec.seed));
+function backLayer(ctx, set, v, col) {
+  const bg = composedBg(set, v); ctx.drawImage(bg, 0, 0);
+  if (v.bg === 'grain' && grainyOf(set, v)) drawGrainySymbol(ctx, set.layout.grainy, col.accent !== col.type ? col.accent : '#ffffff', set.seed);
 }
-function drawFrontLayer(ctx, spec) {
-  const L = spec.layout, c = spec.colors, lc = logoColorOf(spec);
-  L.head.forEach((h, i) => drawText(ctx, h, i === L.accentIdx ? c.accent : c.type));
-  L.info.forEach(t => drawText(ctx, t, c.info));
-  L.logos.forEach(l => { if (l.kind === 'symbol') ctx.drawImage(tinted(HB, lc, l.r - l.l, l.b - l.t), l.l, l.t); if (l.kind === 'wordmark') ctx.drawImage(tinted(WM, c.type, l.r - l.l, l.b - l.t), l.l, l.t); });
-  L.marks.forEach(m => ctx.drawImage(tinted(MARKS[m.idx], c.accent === c.type ? c.type : c.accent, m.w, m.h), m.l, m.t));
+function frontLayer(ctx, set, v, col) {
+  const L = set.layout;
+  // marking sits UNDER the type: it decorates the word, never covers it
+  if ($('marks').checked) L.marks.forEach(m => ctx.drawImage(tinted(MARKS[m.idx], col.accent, m.w, m.h), m.l, m.t));
+  L.head.forEach((h, i) => drawText(ctx, h, col.pc[i]));
+  L.info.forEach(t => drawText(ctx, t, col.info));
+  if (L.symbol) ctx.drawImage(tinted(HB, col.logo, L.symbol.r - L.symbol.l, L.symbol.b - L.symbol.t), L.symbol.l, L.symbol.t);
 }
-function render(spec, canvas, { grid = false, grain = 35, transparent = false } = {}) {
+function render(set, v, canvas, { grid = false, transparent = false } = {}) {
   const ctx = canvas.getContext('2d'); ctx.clearRect(0, 0, FW, FH);
-  if (!transparent) drawBackLayer(ctx, spec, grain);
-  drawFrontLayer(ctx, spec);
-  if (!transparent) drawGrain(ctx, grain);
-  if (grid) drawGrid(ctx, spec.grid);
+  const col = colorsFor(set, v, composedBg(set, v));
+  if (!transparent) backLayer(ctx, set, v, col);
+  frontLayer(ctx, set, v, col);
+  if (!transparent) drawGrain(ctx, +$('grain').value);
+  if (grid) drawGrid(ctx, set.grid);
 }
 
 /* ===== export ===== */
 function download(name, blob) { const a = document.createElement('a'); a.download = name; a.href = URL.createObjectURL(blob); a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 4000); }
-function exportPNG(spec, opts, suffix) { const c = document.createElement('canvas'); c.width = FW; c.height = FH; render(spec, c, { grain: +grainEl.value, ...opts }); c.toBlob(b => download(`BF_${spec.seed}${suffix}.png`, b), 'image/png'); }
-async function exportSVG(spec, mode) {
-  if (mode === 'outline') { const need = ['NP'].concat(spec.layout.head.some(h => h.font === 'MAD') ? ['MAD'] : []); if (!(await ensureOutlines(need))) return; }
-  const c = spec.colors, L = spec.layout, lc = logoColorOf(spec);
-  const bgc = document.createElement('canvas'); bgc.width = FW; bgc.height = FH; const bx = bgc.getContext('2d'); drawBackLayer(bx, spec); drawGrain(bx, +grainEl.value);
+const fname = (set, v, suf) => `BF_${$('preset').value}_${CFILE[v.pal]}_${v.id}_${set.seed}${suf}`;
+function exportPNG(set, v, opts = {}, suf = '') { const c = document.createElement('canvas'); c.width = FW; c.height = FH; render(set, v, c, opts); c.toBlob(b => download(fname(set, v, suf) + '.png', b)); }
+async function ensureOutlines(ids) {
+  for (const id of ids) {
+    if (OT[id]) continue;
+    let buf = await ADB.get('font:' + id);
+    if (!buf && window.queryLocalFonts) { try { const def = FONT_DEFS.find(d => d.id === id); const f = await window.queryLocalFonts({ postscriptNames: [def.names[1]] }); if (f[0]) buf = await (await f[0].blob()).arrayBuffer(); } catch (e) {} }
+    if (!buf) { toast('벡터 변환에 폰트 파일이 필요해요. Chrome의 "로컬 글꼴" 접근을 허용하거나, 설정 화면에서 폰트 파일을 끌어다 놓아 주세요.'); return false; }
+    OT[id] = opentype.parse(buf);
+  }
+  return true;
+}
+async function exportSVG(set, v, mode) {
+  const L = set.layout;
+  if (mode === 'outline' && !(await ensureOutlines(['NP'].concat(L.head.some(h => h.font === 'MAD') ? ['MAD'] : [])))) return;
+  const bgc = document.createElement('canvas'); bgc.width = FW; bgc.height = FH; const bx = bgc.getContext('2d');
+  const col = colorsFor(set, v, composedBg(set, v)); backLayer(bx, set, v, col); drawGrain(bx, +$('grain').value);
   const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
-  const fam = f => f === 'MAD' ? 'MAD Sans Fill' : 'Neue Plak SemiBold, Neue Plak';
-  const live = it => { const l = liveItem(it); return `<text x="${l.x.toFixed(2)}" y="${l.base.toFixed(2)}" font-family="${FAMNAME[l.font]}" font-weight="${l.font.startsWith('MAD') ? 400 : 600}" font-size="${l.fs.toFixed(2)}" fill="${'COL'}">${esc(l.txt)}</text>`; };
-  const outline = (it, col) => {
-    const font = OT[it.font] || OT.NP, p = font.getPath(it.txt, 0, 0, it.fs);
-    const X = v => (it.x + v * it.s).toFixed(2), Y = v => (it.base + v).toFixed(2);
-    const d = p.commands.map(c => c.type === 'M' || c.type === 'L' ? `${c.type}${X(c.x)} ${Y(c.y)}` : c.type === 'C' ? `C${X(c.x1)} ${Y(c.y1)} ${X(c.x2)} ${Y(c.y2)} ${X(c.x)} ${Y(c.y)}` : c.type === 'Q' ? `Q${X(c.x1)} ${Y(c.y1)} ${X(c.x)} ${Y(c.y)}` : 'Z').join('');
-    return `<path data-text="${esc(it.txt)}" d="${d}" fill="${col}"/>`;
-  };
-  const txt = (it, col) => mode === 'outline' ? outline(it, col) : live(it).replace('fill="COL"', `fill="${col}"`);
-  const img = (canvas, l, t, w, h) => `<image x="${l.toFixed(1)}" y="${t.toFixed(1)}" width="${w.toFixed(1)}" height="${h.toFixed(1)}" href="${canvas.toDataURL()}"/>`;
-  const logos = L.logos.filter(l => l.kind !== 'grainy').map(l => img(tinted(l.kind === 'symbol' ? HB : WM, l.kind === 'symbol' ? lc : c.type, (l.r - l.l) * 2, (l.b - l.t) * 2), l.l, l.t, l.r - l.l, l.b - l.t)).join('\n');
-  const marks = L.marks.map(m => img(tinted(MARKS[m.idx], c.accent === c.type ? c.type : c.accent, m.w, m.h), m.l, m.t, m.w, m.h)).join('\n');
-  const grid = spec.grid.V.map(v => `<line x1="${(v * FW).toFixed(1)}" y1="0" x2="${(v * FW).toFixed(1)}" y2="${FH}"/>`).concat(spec.grid.H.map(h => `<line x1="0" y1="${(h * FH).toFixed(1)}" x2="${FW}" y2="${(h * FH).toFixed(1)}"/>`)).join('');
+  const live = (it, c) => { const l = liveItem(it); return `<text x="${l.x.toFixed(2)}" y="${l.base.toFixed(2)}" font-family="${FAMNAME[l.font]}" font-weight="${l.font === 'MAD' ? 400 : 600}" font-size="${l.fs.toFixed(2)}" fill="${c}">${esc(l.txt)}</text>`; };
+  const outline = (it, c) => { const p = (OT[it.font] || OT.NP).getPath(it.txt, 0, 0, it.fs), X = q => (it.x + q * it.s).toFixed(2), Y = q => (it.base + q).toFixed(2);
+    const d = p.commands.map(k => k.type === 'M' || k.type === 'L' ? `${k.type}${X(k.x)} ${Y(k.y)}` : k.type === 'C' ? `C${X(k.x1)} ${Y(k.y1)} ${X(k.x2)} ${Y(k.y2)} ${X(k.x)} ${Y(k.y)}` : k.type === 'Q' ? `Q${X(k.x1)} ${Y(k.y1)} ${X(k.x)} ${Y(k.y)}` : 'Z').join('');
+    return `<path data-text="${esc(it.txt)}" d="${d}" fill="${c}"/>`; };
+  const txt = (it, c) => mode === 'outline' ? outline(it, c) : live(it, c);
+  const img = (cv, l, t, w, h) => `<image x="${l.toFixed(1)}" y="${t.toFixed(1)}" width="${w.toFixed(1)}" height="${h.toFixed(1)}" href="${cv.toDataURL()}"/>`;
+  const S = L.symbol, showSym = !!S;
+  const logo = showSym ? img(tinted(HB, col.logo, (S.r - S.l) * 2, (S.b - S.t) * 2), S.l, S.t, S.r - S.l, S.b - S.t) : '';
+  const marks = $('marks').checked ? L.marks.map(m => img(tinted(MARKS[m.idx], col.accent, m.w, m.h), m.l, m.t, m.w, m.h)).join('') : '';
+  const grid = set.grid.V.map(q => `<line x1="${(q * FW).toFixed(1)}" y1="0" x2="${(q * FW).toFixed(1)}" y2="${FH}"/>`).concat(set.grid.H.map(q => `<line x1="0" y1="${(q * FH).toFixed(1)}" x2="${FW}" y2="${(q * FH).toFixed(1)}"/>`)).join('');
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${FW}" height="${FH}" viewBox="0 0 ${FW} ${FH}">
 <g id="background">${img(bgc, 0, 0, FW, FH)}</g>
-<g id="headline">${L.head.map((h, i) => txt(h, i === L.accentIdx ? c.accent : c.type)).join('\n')}</g>
-<g id="info">${L.info.map(t => txt(t, c.info)).join('\n')}</g>
-<g id="logo">${logos}</g>
-<g id="hand-drawn">${marks}</g>
+<g id="marking">${marks}</g>
+<g id="headline">${L.head.map((h, i) => txt(h, col.pc[i])).join('\n')}</g>
+<g id="info">${L.info.map(t => txt(t, col.info)).join('\n')}</g>
+<g id="logo">${logo}</g>
 <g id="grid" stroke="#ffffff" stroke-opacity=".6" stroke-width="2">${grid}</g>
 </svg>`;
-  download(`BF_${spec.seed}_${mode === 'outline' ? 'outline' : 'text'}.svg`, new Blob([svg], { type: 'image/svg+xml' }));
+  download(fname(set, v, mode === 'outline' ? '_outline' : '_text') + '.svg', new Blob([svg], { type: 'image/svg+xml' }));
+}
+
+/* ===== images (kept in this browser) ===== */
+const DB = (() => {
+  const open = () => new Promise((res, rej) => { const r = indexedDB.open('team-type-images', 1); r.onupgradeneeded = () => r.result.createObjectStore('img', { autoIncrement: true }); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); });
+  const run = async (mode, fn) => { const db = await open(); return new Promise((res, rej) => { const t = db.transaction('img', mode), st = t.objectStore('img'), q = fn(st); t.oncomplete = () => res(q && q.result); t.onerror = () => rej(t.error); }); };
+  return {
+    add: b => run('readwrite', st => st.add(b)),
+    del: k => run('readwrite', st => st.delete(k)),
+    all: async () => { const db = await open(); return new Promise(res => { const out = []; const c = db.transaction('img').objectStore('img').openCursor(); c.onsuccess = () => { const cur = c.result; if (cur) { out.push({ key: cur.key, blob: cur.value }); cur.continue(); } else res(out); }; }); }
+  };
+})();
+let IMGS = [], BUILT = [];
+async function refreshPool() {
+  try { IMGS = await DB.all(); } catch (e) { /* storage blocked: keep in-memory list */ }
+  if (!BUILT.length && BUILTIN.length) BUILT = await Promise.all(BUILTIN.map(loadImg));
+  const mine = await Promise.all(IMGS.map(i => loadImg(i.url || (i.url = URL.createObjectURL(i.blob)))));
+  POOL = ($('useBuiltin').checked ? BUILT : []).concat(mine);
+  META = ($('useBuiltin').checked ? BUILTIN_META : []).concat(mine.map(classify));
+  $('thumbs').innerHTML = '';
+  if ($('useBuiltin').checked) BUILTIN.forEach(src => { const d = document.createElement('div'); d.className = 'thumb'; d.innerHTML = `<img src="${src}"><span style="position:absolute;left:2px;bottom:2px;font-size:9px;background:rgba(0,0,0,.7);color:#fff;padding:0 3px;border-radius:3px">기본</span>`; $('thumbs').appendChild(d); });
+  IMGS.forEach((im, i) => { const d = document.createElement('div'); d.className = 'thumb'; d.innerHTML = `<img src="${im.url}"><button title="빼기">×</button>`; d.querySelector('button').onclick = async e => { e.stopPropagation(); try { await DB.del(im.key); } catch (er) { IMGS.splice(i, 1); } await refreshPool(); drawAll(); }; $('thumbs').appendChild(d); });
+}
+// tag a dropped image: red / orange / natural from its average colour
+function classify(img) {
+  const c = document.createElement('canvas'); c.width = 32; c.height = 40; const x = c.getContext('2d'); x.drawImage(img, 0, 0, 32, 40);
+  const d = x.getImageData(0, 0, 32, 40).data; let r = 0, g = 0, b = 0, sat = 0; const n = d.length / 4;
+  for (let i = 0; i < d.length; i += 4) { r += d[i]; g += d[i + 1]; b += d[i + 2]; const mx = Math.max(d[i], d[i + 1], d[i + 2]), mn = Math.min(d[i], d[i + 1], d[i + 2]); sat += mx ? (mx - mn) / mx : 0; }
+  r /= n; g /= n; b /= n; sat /= n;
+  let tone = 'natural';
+  if (sat > .35 && r > g * 1.6 && r > b * 1.6) tone = g > b * 1.4 && g > r * .3 ? 'orange' : 'red';
+  return { tone, dir: null, free: null };
+}
+async function addFiles(files) {
+  for (const f of files) if (f.type.startsWith('image/')) { try { await DB.add(f); } catch (e) { IMGS.push({ key: Math.random(), blob: f }); } }
+  await refreshPool(); BG.clear(); regen();
 }
 
 /* ===== app ===== */
-const $ = id => document.getElementById(id);
-const cardsEl = $('cards'), grainEl = $('grain'), gridEl = $('showgrid');
-let specs = [];
-function makeSpec(seed) {
-  const R = mulberry32(seed), sp = $('split').value;
-  const spec = { seed, grid: makeGrid(R), colors: makeColors(R, $('color').value), split: sp === 'random' ? pick(R, ['2', '2', '3', '3', '1']) : sp,
-    logoMode: $('logo').value, layoutMode: $('layoutMode').value, fontMode: $('fontMode').value, pattern: $('pattern').value, zone: $('zone').value };
-  spec.layout = layout(spec); resolveColors(spec); return spec;
-}
-function resolveColors(spec) {
-  const c = spec.colors; if (!['uagrad', 'gradient', 'thermal'].includes(c.mode)) return;
-  const k = .1, cv = document.createElement('canvas'); cv.width = FW * k; cv.height = FH * k;
-  const x = cv.getContext('2d'); x.scale(k, k); drawBg(x, c);
-  const d = x.getImageData(0, 0, cv.width, cv.height).data;
-  const avg = rs => { let r = 0, g = 0, b = 0, n = 0; rs.forEach(o => { for (let yy = Math.max(0, Math.floor(o.t * k)); yy < Math.min(cv.height, Math.ceil(o.b * k)); yy++) for (let xx = Math.max(0, Math.floor(o.l * k)); xx < Math.min(cv.width, Math.ceil(o.r * k)); xx++) { const i = (yy * cv.width + xx) * 4; r += d[i]; g += d[i + 1]; b += d[i + 2]; n++; } }); if (!n) return c.tone; return '#' + [r, g, b].map(v => Math.round(v / n).toString(16).padStart(2, '0')).join(''); };
-  const L = spec.layout, oldType = c.type;
-  const headBg = avg(L.head), fg = bw(headBg);
-  c.type = fg; if (c.accent === oldType || contrast(c.accent, headBg) < 2) c.accent = fg;
-  const infoRects = L.info.map(t => ({ l: t.x, r: t.x + measure(t.txt, t.fs).w * t.s, t: t.base - t.fs * .7, b: t.base }));
-  c.info = bw(avg(infoRects));
-  c.tone = headBg;
-}
-const LABEL = { uagrad: '브랜드 그라데이션', core: '브랜드 코어', accent: '블랙+포인트', clash: '충돌', gradient: '그라데이션', thermal: '열화상' };
-const LOGO = { symbol: '심볼', wordmark: '워드마크', both: '심볼+워드마크', grainy: '그레이니' };
-const PAT = { none: '', clean: ' · 클린 패턴', gritty: ' · 그리티 패턴', drawn: ' · 손그림' };
-const FONT = { np: 'Neue Plak', mad: 'MAD Sans', mix: '섞기' };
-function card(spec, idx) {
-  const el = document.createElement('div'); el.className = 'card'; el.dataset.choice = 'seed-' + spec.seed;
-  const cv = document.createElement('canvas'); cv.width = FW; cv.height = FH; render(spec, cv, { grid: gridEl.checked, grain: +grainEl.value });
-  cv.onclick = () => el.classList.toggle('selected');
-  const L = spec.layout, tag = document.createElement('div'); tag.className = 'tag';
-  tag.innerHTML = `<b>#${spec.seed}</b> · ${L.strategy} · ${FONT[L.fontMode]} · ${LABEL[spec.colors.mode]} · ${LOGO[L.logo]}${PAT[L.pattern]}`;
-  const btns = document.createElement('div'); btns.className = 'btns';
-  const B = (t, title, fn) => { const b = document.createElement('button'); b.textContent = t; b.title = title; b.onclick = fn; btns.appendChild(b); };
-  B('↻', '이 칸만 새로', () => { specs[idx] = makeSpec(newSeed()); el.replaceWith(card(specs[idx], idx)); });
-  B('PNG', '기본 PNG', () => exportPNG(spec, {}, ''));
-  B('투명', '배경·패턴 없이 글자·로고·손그림만', () => exportPNG(spec, { transparent: true }, '_transparent'));
-  B('그리드', '그리드 선 포함 PNG', () => exportPNG(spec, { grid: true }, '_grid'));
-  B('SVG 아웃라인', 'Figma용: 글자 벡터, 가이드 장평 그대로', () => exportSVG(spec, 'outline'));
-  B('SVG 텍스트', 'Figma용: 폭 패밀리로 바꾼 편집 가능한 텍스트', () => exportSVG(spec, 'text'));
-  el.append(cv, tag, btns); return el;
-}
+let sets = []; // each entry is one look
 const newSeed = () => Math.floor(Math.random() * 99999) + 1;
-function drawAll() { cardsEl.innerHTML = ''; specs.forEach((s, i) => cardsEl.appendChild(card(s, i))); }
-function regen() { specs = [...Array(N)].map(() => makeSpec(newSeed())); drawAll(); }
-$('regen').onclick = regen;
-['logo', 'color', 'split', 'layoutMode', 'fontMode', 'pattern', 'zone'].forEach(id => $(id).onchange = () => { specs = specs.map(s => makeSpec(s.seed)); drawAll(); });
-grainEl.onchange = drawAll; gridEl.onchange = drawAll; $('preview').onchange = drawAll;
-$('load').onclick = () => { const v = +$('seedIn').value; if (v > 0) { specs.unshift(makeSpec(v)); specs = specs.slice(0, N); drawAll(); } };
+const WEIGHTS = { natural: 3, red: 2.5, orange: 2.5, thermal: .6 };
+function pickImage(R, avoid) {
+  if (!POOL.length) return 0;
+  const w = META.map((m, i) => (avoid.has(i) && avoid.size < POOL.length) ? 0 : REC() ? (WEIGHTS[m.tone] ?? 1) : 1);
+  const tot = w.reduce((a, b) => a + b, 0); if (!tot) return Math.floor(R() * POOL.length);
+  let t = R() * tot; for (let i = 0; i < w.length; i++) { t -= w[i]; if (t <= 0) return i; } return w.length - 1;
+}
+function bestLayout(sub, lm, salt) {
+  const tries = +$('tries').value; let best = null, bs = -1e9;
+  for (let k = 0; k < tries; k++) { const L = layout(sub, sub.seed * 7 + 13 + k * 1013 + salt, lm); const sc = scoreLayout(sub, L); if (sc > bs) { best = L; bs = sc; } }
+  best.score = bs; return best;
+}
+function buildLayout(sub) {
+  sub.busy = busyMap(sub); sub._field = null;
+  sub.layout = bestLayout(sub, sub.layoutMode, 0); sub.layouts = {};
+  VARIANTS.forEach((v, i) => { if (v.lm && v.lm !== sub.layoutMode) sub.layouts[v.lm] = bestLayout(sub, v.lm, 7919 * (i + 1)); });
+}
+// a variant with its own layout family sees the look through that layout
+const viewOf = (sub, v) => v.lm && sub.layouts && sub.layouts[v.lm] ? Object.assign(Object.create(sub), { layout: sub.layouts[v.lm] }) : sub;
+const usedImgs = except => new Set(sets.filter(x => x !== except).map(x => x.imgIdx));
+function makeLookSet(seed, color, avoid) {
+  const R = mulberry32(seed * 31 + 1), sp = $('split').value;
+  const sub = { seed, pair: 'L', layoutMode: PRESET().lm, grid: makeGrid(R), split: sp === 'random' ? pick(R, ['2', '2', '3', '3', '1']) : sp, fontMode: $('fontMode').value, logoMode: $('logo').value, treatR: R() < .5 ? 'natural' : 'duo', groundR: pick(R, ['dark', 'dark', 'dark', 'light', 'color']) };
+  sub.imgIdx = pickImage(R, avoid || new Set());
+  sub.fx = makeFx(R, metaOf(sub)); sub.look = makeLook(R, metaOf(sub)); sub.color = color || (R() < .5 ? 'brw' : 'pt');
+  sub.frame = PRESET().images ? makeFrame(R, sub.grid) : { kind: 'full', l: 0, t: 0, r: FW, b: FH };
+  buildLayout(sub); fixLook(sub, avoid);
+  return sub;
+}
+// keep re-rolling the layout (and every 4th try the photo) until the look meets the chosen audit level
+function fixLook(sub, avoid) {
+  const mode = $('audit').value; let res = auditPair(sub), t = 0;
+  while (!okLevel(res, mode) && t < 10) {
+    t++;
+    if (t % 4 === 0) { const R = mulberry32(newSeed()); sub.imgIdx = pickImage(R, avoid || new Set()); sub.fx = makeFx(R, metaOf(sub)); sub.look = makeLook(R, metaOf(sub)); }
+    sub.seed = newSeed(); buildLayout(sub); res = auditPair(sub);
+  }
+  sub.audit = res;
+}
+const auditPenalty = sub => (sub.audit || []).reduce((a, r) => a + r.issues.filter(i => i.lv === 'fail').length * 3 + r.issues.filter(i => i.lv === 'warn').length * .5, 0);
+const lookScore = x => x.layout.score - auditPenalty(x);
+const TONE = { natural: '자연색', red: '레드', orange: '오렌지', thermal: '열화상(v1)' };
+const FRAME = { full: '꽉 채움', box: '박스', strip: '가로 띠', column: '세로 띠' };
+function setRow(set, idx) {
+  const wrap = document.createElement('div'); wrap.className = 'set';
+  const head = document.createElement('div'); head.className = 'sethead';
+  const m = metaOf(set);
+  head.innerHTML = `<b style="color:${ACC[palOf(set)]}">● ${CNAME[palOf(set)]}</b><span class="pair">#${set.seed} · ${PRESET().images ? (POOL.length ? `사진 ${set.imgIdx % POOL.length + 1} (${TONE[m.tone]}) · ${FRAME[set.frame.kind]} · ` : '사진 없음 · ') : ''}${set.layout.strategy}</span>`;
+  const btn = (t, fn) => { const b = document.createElement('button'); b.textContent = t; b.onclick = fn; head.appendChild(b); return b; };
+  const redraw = () => wrap.replaceWith(setRow(set, idx));
+  if (PRESET().images) btn('사진만 ↻', () => { const R = mulberry32(newSeed()); set.imgIdx = pickImage(R, usedImgs(set)); set.fx = makeFx(R, metaOf(set)); set.look = makeLook(R, metaOf(set)); set.layout.fx = set.fx; set.busy = busyMap(set); set._field = null; set.audit = auditPair(set); redraw(); });
+  if (PRESET().images) btn('크롭 영역 ↻', () => {
+    // same photo, same layout: only the crop box changes (full / grid box / band / column, and its size)
+    const R = mulberry32(newSeed()), kinds = ['full', 'box', 'box', 'strip', 'column'].filter(k => k !== set.frame.kind || k === 'box');
+    set.frame = makeFrame(R, set.grid, pick(R, kinds)); set.busy = busyMap(set); set.audit = auditPair(set); redraw();
+  });
+  btn('레이아웃 ↻', () => { set.seed = newSeed(); buildLayout(set); fixLook(set, usedImgs(set)); redraw(); });
+  btn(set.color === 'brw' ? '레드 → 포인트' : '포인트 → 레드', () => { set.color = set.color === 'brw' ? 'pt' : 'brw'; set.audit = auditPair(set); redraw(); });
+  btn('새로 ↻', () => { sets[idx] = makeLookSet(newSeed(), set.color, usedImgs(set)); wrap.replaceWith(setRow(sets[idx], idx)); });
+  const row = document.createElement('div'); row.className = 'row';
+  VARIANTS.forEach(v0 => {
+    const v = effV(set, v0), sv = viewOf(set, v0);
+    const card = document.createElement('div'); card.className = 'card';
+    const cv = document.createElement('canvas'); cv.width = FW; cv.height = FH; render(sv, v, cv, { grid: $('showgrid').checked });
+    cv.onclick = () => card.classList.toggle('selected');
+    const r = REC() && PRESET().images ? recipe(sv, v) : null;
+    const tag = document.createElement('div'); tag.className = 'tag'; tag.textContent = `${v0.label}${r ? ' · ' + (r.treat === 'natural' ? '자연색' : '듀오톤') + (r.halftone ? '+하프톤' : '') + (r.grainy ? '+그레이니 심볼' : '') + (r.tone ? '+톤온톤' : '') : ''}`;
+    const au = auditCard(sv, v), badge = document.createElement('div'); badge.className = 'audit ' + au.level;
+    badge.innerHTML = au.level === 'pass' ? '✓ 가이드 검수 통과' : au.issues.map(i => `${i.lv === 'fail' ? '✕' : '⚠'} ${i.msg}`).join('<br>');
+    const btns = document.createElement('div'); btns.className = 'btns';
+    const B = (t, fn) => { const b = document.createElement('button'); b.textContent = t; b.onclick = fn; btns.appendChild(b); };
+    B('PNG', () => exportPNG(sv, v)); B('투명', () => exportPNG(sv, v, { transparent: true }, '_transparent')); B('그리드', () => exportPNG(sv, v, { grid: true }, '_grid'));
+    B('SVG 아웃라인', () => exportSVG(sv, v, 'outline')); B('SVG 텍스트', () => exportSVG(sv, v, 'text'));
+    card.append(cv, tag, badge, btns); row.appendChild(card);
+  });
+  wrap.append(head, row); return wrap;
+}
+function drawAll() { document.body.classList.toggle('recipe', REC()); const el = $('sets'); el.innerHTML = ''; sets.forEach((s, i) => el.appendChild(setRow(s, i))); }
+function regen() {
+  const n = +$('nsets').value, extra = +$('tries').value > 1 ? 2 : 1;
+  // build more looks than needed, keep the best ones, never repeat a photo, alternate red / orange
+  const avoid = new Set(), cands = [];
+  for (let k = 0; k < n * extra; k++) { const x = makeLookSet(newSeed(), null, avoid); cands.push(x); if (avoid.size < POOL.length - 1) avoid.add(x.imgIdx); }
+  const picked = (extra > 1 ? cands.sort((a, b) => lookScore(b) - lookScore(a)) : cands).slice(0, n);
+  picked.forEach((x, i) => x.color = i % 2 ? 'pt' : 'brw');
+  sets = picked; drawAll();
+}
+const resetBg = () => { BG.clear(); sets.forEach(x => x._field = null); };
+$('regen').onclick = regen; $('nsets').onchange = regen; $('mode').onchange = () => { resetBg(); regen(); }; $('tries').onchange = regen; $('audit').onchange = regen;
+['split', 'fontMode', 'logo'].forEach(id => $(id).onchange = regen);
+$('infoSize').onchange = regen; $('frame').onchange = regen;
+$('point').onchange = () => { BG.clear(); sets.forEach(x => x.audit = auditPair(x)); drawAll(); };
+['blur', 'band', 'glitch', 'expo', 'motion', 'ground', 'halftone', 'treat'].forEach(id => $(id).onchange = () => { resetBg(); drawAll(); });
+['grain', 'marks', 'showgrid', 'preview', 'tone'].forEach(id => $(id).onchange = drawAll);
+$('lab').onchange = () => { BG.clear(); drawAll(); };
+$('useBuiltin').onchange = async () => { await refreshPool(); BG.clear(); regen(); };
+$('load').onclick = () => { const v = +$('seedIn').value; if (v > 0) { sets.unshift(makeLookSet(v, 'brw', usedImgs())); sets = sets.slice(0, +$('nsets').value); drawAll(); } };
+const drop = $('drop');
+drop.onclick = () => $('pick').click(); $('pick').onchange = e => addFiles([...e.target.files]);
+drop.ondragover = e => { e.preventDefault(); drop.classList.add('over'); }; drop.ondragleave = () => drop.classList.remove('over');
+drop.ondrop = e => { e.preventDefault(); drop.classList.remove('over'); addFiles([...e.dataTransfer.files]); };
 
-/* ===== storage (IndexedDB: assets & dropped fonts stay in this browser) ===== */
-const DB = (() => {
+/* ===== gate, setup, start (shared storage with v1: same password, same asset zip) ===== */
+const ADB = (() => {
   const open = () => new Promise((res, rej) => { const r = indexedDB.open('bf-type-generator', 1); r.onupgradeneeded = () => r.result.createObjectStore('files'); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); });
   const tx = async (mode, fn) => { const db = await open(); return new Promise((res, rej) => { const t = db.transaction('files', mode), st = t.objectStore('files'), out = fn(st); t.oncomplete = () => res(out && out.result); t.onerror = () => rej(t.error); }); };
   return { get: k => tx('readonly', st => st.get(k)), set: (k, v) => tx('readwrite', st => st.put(v, k)), clear: () => tx('readwrite', st => st.clear()) };
 })();
-
 const PW_HASH = 'a54641e4a7cb9e44720c8d0d53b640ce3ab4d40d9dd3ed655055b91bcd5ba062';
 const sha256 = async t => [...new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(t)))].map(x => x.toString(16).padStart(2, '0')).join('');
-const FONT_DEFS = [
-  { id: 'NP', names: ['Neue Plak SemiBold', 'NeuePlak-SemiBold'], required: true },
-  { id: 'NPW', names: ['Neue Plak Wide SemiBold', 'NeuePlak-WideSemiBold'] },
-  { id: 'NPE', names: ['Neue Plak Extended SemiBold', 'NeuePlak-ExtendedSemiBold'] },
-  { id: 'NPN', names: ['Neue Plak Narrow SemiBold', 'NeuePlak-NarrowSemiBold'] },
-  { id: 'NPC', names: ['Neue Plak Condensed SemiBold', 'NeuePlak-CondSemiBold'] },
-  { id: 'NPX', names: ['Neue Plak Compressed SemiBold', 'NeuePlak-CompSemiBold'] },
-  { id: 'MAD', names: ['MAD Sans Fill Regular', 'MADSansFill-Regular'] },
-  { id: 'MADB', names: ['MAD Sans Fill Bold', 'MADSansFill-Bold'] }
-];
 const ASSETS = ['hb_white.png', 'hb_white_lg.png', 'wm_white.png', ...[...Array(12)].map((_, i) => `drawn_${i + 1}.png`)];
-const FONT_OK = {}, FONT_SRC = {};
-let started = false;
-
+const FONT_SRC = {}; let started = false;
 async function loadFonts() {
   for (const def of FONT_DEFS) {
     if (FONT_OK[def.id]) continue;
-    const buf = await DB.get('font:' + def.id);
+    const buf = await ADB.get('font:' + def.id);
     const face = buf ? new FontFace(def.id, buf) : new FontFace(def.id, def.names.map(n => `local("${n}")`).join(', '));
     try { await face.load(); document.fonts.add(face); FONT_OK[def.id] = true; FONT_SRC[def.id] = buf ? '끌어다 놓은 파일' : '설치된 폰트'; } catch (e) { FONT_OK[def.id] = false; }
   }
 }
-async function assetsReady() { for (const n of ASSETS) if (!(await DB.get('asset:' + n))) return false; return true; }
+async function assetsReady() { for (const n of ASSETS) if (!(await ADB.get('asset:' + n))) return false; return true; }
 async function renderSetup() {
   $('fontList').innerHTML = FONT_DEFS.map(d => `<li class="${FONT_OK[d.id] ? 'ok' : d.required ? 'no' : 'opt'}">${FONT_OK[d.id] ? '✓' : d.required ? '✗' : '–'} ${d.names[0]}${FONT_OK[d.id] ? ` <span class="opt">(${FONT_SRC[d.id]})</span>` : d.required ? ' (꼭 필요해요)' : ' (없으면 이 서체 기능만 빠져요)'}</li>`).join('');
   const ok = await assetsReady();
@@ -659,59 +1010,52 @@ async function ingest(files) {
     const name = f.name.toLowerCase();
     if (name.endsWith('.zip')) {
       const zip = await JSZip.loadAsync(f); let n = 0;
-      for (const a of ASSETS) { const entry = Object.values(zip.files).find(z => !z.dir && z.name.split('/').pop() === a); if (entry) { await DB.set('asset:' + a, await entry.async('blob')); n++; } }
+      for (const a of ASSETS) { const entry = Object.values(zip.files).find(z => !z.dir && z.name.split('/').pop() === a); if (entry) { await ADB.set('asset:' + a, await entry.async('blob')); n++; } }
       msg.push(n === ASSETS.length ? '에셋을 다 불러왔어요.' : `zip 안에서 ${n}/${ASSETS.length}개만 찾았어요. 팀에서 받은 zip이 맞는지 확인해 주세요.`);
     } else if (name.endsWith('.ttf') || name.endsWith('.otf')) {
       const buf = await f.arrayBuffer(), ps = psNameOf(buf), def = FONT_DEFS.find(d => d.names.includes(ps));
-      if (def) { await DB.set('font:' + def.id, buf); FONT_OK[def.id] = false; msg.push(`${def.names[0]} 폰트를 불러왔어요.`); } else msg.push(`${f.name}: 이 제너레이터에서 쓰는 폰트가 아니에요.`);
+      if (def) { await ADB.set('font:' + def.id, buf); FONT_OK[def.id] = false; msg.push(`${def.names[0]} 폰트를 불러왔어요.`); } else msg.push(`${f.name}: 이 제너레이터에서 쓰는 폰트가 아니에요.`);
     }
   }
   await loadFonts(); $('setupMsg').textContent = msg.join(' '); renderSetup();
 }
-async function ensureOutlines(ids) {
-  // glyph outlines: use a dropped font file, otherwise read the installed font (Chrome/Edge asks once)
-  for (const id of ids) {
-    if (OT[id]) continue;
-    let buf = await DB.get('font:' + id);
-    if (!buf && window.queryLocalFonts) {
-      try { const def = FONT_DEFS.find(d => d.id === id); const fonts = await window.queryLocalFonts({ postscriptNames: [def.names[1]] }); if (fonts[0]) buf = await (await fonts[0].blob()).arrayBuffer(); } catch (e) {}
-    }
-    if (!buf) { toast('글자를 벡터로 바꾸려면 폰트 파일이 필요해요. Chrome에서 "로컬 글꼴" 접근을 허용하거나, 설정 화면에서 폰트 파일(.ttf/.otf)을 끌어다 놓아 주세요.'); return false; }
-    OT[id] = opentype.parse(buf);
-  }
-  return true;
+function applyPreset() {
+  const P = PRESET(); VARIANTS = P.variants;
+  $('point').value = P.point; $('marks').checked = P.marks;
+  document.body.classList.toggle('noimg', !P.images);
+  $('subText').innerHTML = `<b>${$('preset').selectedOptions[0].textContent}</b> — ${P.sub}. 룩마다 2장(${P.variants.map(v => v.label).join(' / ')})이 나오고, 룩마다 브랜드 컬러 ↔ 포인트 컬러를 바꿀 수 있어요. 마음에 드는 룩 2개를 골라 하나는 브랜드, 하나는 포인트로 두면 최종 4장이 돼요.`;
+  try { localStorage.setItem('bf-preset', $('preset').value); } catch (e) {}
 }
-function toast(t) { let el = document.getElementById('toast'); if (!el) { el = document.createElement('div'); el.id = 'toast'; el.style.cssText = 'position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:#222;color:#fff;border:1px solid #c8ff3c;border-radius:10px;padding:12px 16px;font-size:13px;max-width:560px;line-height:1.6;z-index:20'; document.body.appendChild(el); } el.textContent = t; el.hidden = false; clearTimeout(el._t); el._t = setTimeout(() => el.hidden = true, 7000); }
 async function startApp() {
   started = true; localStorage.setItem('bf-auto', '1');
   $('setup').hidden = true; $('app').hidden = false;
-  const url = async n => URL.createObjectURL(await DB.get('asset:' + n));
+  const url = async n => URL.createObjectURL(await ADB.get('asset:' + n));
+  HB = await loadImg(await url('hb_white.png')); HBL = await loadImg(await url('hb_white_lg.png'));
+  for (let i = 1; i <= 12; i++) MARKS[i] = await loadImg(await url(`drawn_${i}.png`));
+  if (!FONT_OK.MAD) [...$('fontMode').options].forEach(o => { if (o.value !== 'np') o.disabled = true; });
   calibrateFamilies();
-  [HB, HBL, WM] = await Promise.all(['hb_white.png', 'hb_white_lg.png', 'wm_white.png'].map(async n => loadImg(await url(n))));
-  const ms = await Promise.all([...Array(12)].map(async (_, i) => loadImg(await url(`drawn_${i + 1}.png`)))); ms.forEach((m, i) => MARKS[i + 1] = m);
-  if (!FONT_OK.MAD) { [...$('fontMode').options].forEach(o => { if (o.value !== 'np') o.disabled = true; }); $('fontMode').value = 'np'; }
   NOISE = document.createElement('canvas'); NOISE.width = FW; NOISE.height = FH;
   const nx = NOISE.getContext('2d'), nd = nx.createImageData(FW, FH);
   for (let i = 0; i < nd.data.length; i += 4) { const v = Math.random() * 255; nd.data[i] = nd.data[i + 1] = nd.data[i + 2] = v; nd.data[i + 3] = 255; }
   nx.putImageData(nd, 0, 0);
+  try { const p = localStorage.getItem('bf-preset'); if (p && PRESETS[p]) $('preset').value = p; } catch (e) {}
+  applyPreset();
+  await refreshPool();
   regen();
 }
 async function openSetup() { $('gate').hidden = true; $('app').hidden = true; $('setup').hidden = false; await loadFonts(); renderSetup(); }
-
+$('preset').onchange = () => { applyPreset(); BG.clear(); regen(); };
 $('gateForm').onsubmit = async e => {
   e.preventDefault();
   if (await sha256($('pw').value.trim()) === PW_HASH) { localStorage.setItem('bf-pass', PW_HASH); openSetup(); }
   else { $('pwErr').textContent = '비밀번호가 달라요.'; $('pw').select(); }
 };
-const drop = $('drop');
-drop.onclick = () => $('filePick').click();
-$('filePick').onchange = e => ingest([...e.target.files]);
-drop.ondragover = e => { e.preventDefault(); drop.classList.add('over'); };
-drop.ondragleave = () => drop.classList.remove('over');
-drop.ondrop = e => { e.preventDefault(); drop.classList.remove('over'); ingest([...e.dataTransfer.files]); };
+const ad = $('adrop');
+ad.onclick = () => $('afile').click(); $('afile').onchange = e => ingest([...e.target.files]);
+ad.ondragover = e => { e.preventDefault(); ad.classList.add('over'); }; ad.ondragleave = () => ad.classList.remove('over');
+ad.ondrop = e => { e.preventDefault(); ad.classList.remove('over'); ingest([...e.dataTransfer.files]); };
 $('startBtn').onclick = startApp;
-$('resetBtn').onclick = async () => { if (!confirm('이 브라우저에 저장된 에셋과 폰트 파일을 지울까요?')) return; await DB.clear(); localStorage.removeItem('bf-auto'); location.reload(); };
-$('toSetup').onclick = () => { localStorage.removeItem('bf-auto'); location.reload(); };
+$('resetBtn').onclick = async () => { if (!confirm('이 브라우저에 저장된 에셋과 폰트 파일을 지울까요?')) return; await ADB.clear(); localStorage.removeItem('bf-auto'); location.reload(); };
 if (localStorage.getItem('bf-pass') === PW_HASH) openSetup();
 </script>
 </body>
