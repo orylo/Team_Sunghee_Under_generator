@@ -467,23 +467,27 @@ function colorsFor(look, bg) {
 // field of play: one or two fragments per frame, hairlines snapped to the frame (guide p.67–69)
 function arc(cx, cy, rx, ry, a0, a1, n) { const p = []; for (let i = 0; i <= n; i++) { const a = a0 + (a1 - a0) * i / n; p.push([cx + Math.cos(a) * rx, cy + Math.sin(a) * ry]); } return p; }
 const E = 24;
+// every form is a crop of a real court that runs out of the frame — nothing floats as a closed shape
 const FORMS = {
-  penalty: { name: '페널티 박스', f: () => { const y = FH * .075; return [[[-E, y], [FW + E, y]], arc(FW / 2, y, FW * .3, FH * .1, 0, Math.PI, 7), arc(FW / 2, FH + 2, FW * .27, FH * .085, Math.PI, 2 * Math.PI, 7)]; } },
+  penalty: { name: '축구 페널티 박스', f: () => { const y = FH * .07, bl = FW * .16, br = FW * .84, by = FH * .33, sl = FW * .34, sr = FW * .66, sy = FH * .15;
+    return [[[-E, y], [FW + E, y]], [[bl, y], [bl, by], [br, by], [br, y]], [[sl, y], [sl, sy], [sr, sy], [sr, y]], arc(FW / 2, by, FW * .17, FH * .07, 0, Math.PI, 7)]; } },
   corner: { name: '코너', f: () => { const x = FW * .07, y = FH * .945; return [[[x, -E], [x, y], [FW + E, y]], [[FW + E, FH * .56], [FW * .55, FH * .56], [FW * .55, y]], arc(x, y, FW * .07, FW * .07, -Math.PI / 2, 0, 4)]; } },
-  arch: { name: '아치 + 눈금', f: () => { const l = FW * .14, r = FW * .74, t = FH * .38, b = FH * .93, out = [[[l, b], ...arc((l + r) / 2, t, (r - l) / 2, FH * .15, Math.PI, 2 * Math.PI, 7), [r, b]]];
-    for (let k = 0; k < 4; k++) { const y = FH * (.46 + k * .075); out.push([[l - 14, y], [l, y]], [[r, y], [r + 14, y]]); }
-    out.push([[-E, FH * .225], [FW * .2, FH * .155], [FW * .7, FH * .155], [FW + E, FH * .215]], [[-E, b], [FW + E, b]]); return out; } },
+  hoop: { name: '농구 3점 라인', f: () => { const b = FH * .955, kl = FW * .33, kr = FW * .67, kt = FH * .6, tl = FW * .07, tr = FW * .93, ty = FH * .8;
+    const three = arc(FW / 2, ty, (tr - tl) / 2, FH * .3, Math.PI, 2 * Math.PI, 9);
+    const out = [[[-E, b], [FW + E, b]], [[kl, b], [kl, kt], [kr, kt], [kr, b]], arc(FW / 2, kt, (kr - kl) / 2, FH * .085, Math.PI, 2 * Math.PI, 7), [[tl, b], ...three, [tr, b]]];
+    for (let k = 1; k <= 3; k++) { const y = kt + (b - kt) * k / 4; out.push([[kl - 14, y], [kl, y]], [[kr, y], [kr + 14, y]]); } return out; } },
   lanes: { name: '레인 + 눈금', f: () => { const y1 = FH * .27, y2 = FH * .62, x = FW * .925, out = [[[-E, y1], [FW + E, y1]], [[-E, y2], [FW + E, y2]], [[x, -E], [x, FH + E]]];
     for (let k = 0; k < 4; k++) { const tx = FW * (.12 + k * .14); out.push([[tx, y1], [tx, y1 - 16]], [[tx, y2], [tx, y2 - 16]]); } return out; } },
   center: { name: '센터 서클', f: () => [arc(FW / 2, FH * .48, FW * .62, FH * .36, Math.PI / 16, 2 * Math.PI + Math.PI / 16, 16), [[FW / 2, -E], [FW / 2, FH + E]]] },
-  lens: { name: '애그노스틱', f: () => [[[FW / 2, -E], [FW * .735, FH * .42], [FW * .735, FH * .58], [FW / 2, FH + E], [FW * .265, FH * .58], [FW * .265, FH * .42], [FW / 2, -E]],
-    arc(FW / 2, FH / 2, FW * .25, FH * .3, -Math.PI / 2, 1.5 * Math.PI, 12), [[-E, FH * .13], [FW * .27, FH * .13], [FW * .4, FH * .25]], [[FW + E, FH * .87], [FW * .73, FH * .87], [FW * .6, FH * .75]]] },
-  box: { name: '박스 + 눈금', f: () => { const x = FW * .77, y1 = FH * .115, y2 = FH * .43, yb = FH * .885, out = [[[-E, y1], [x, y1]], [[-E, y2], [x, y2]], [[x, -E], [x, yb]], [[-E, yb], [x, yb]], [[-E, FH * .72], [FW * .2, FH * .775], [x, FH * .775]]];
+  yards: { name: '미식축구 야드 라인', f: () => { const out = [], x1 = FW * .36, x2 = FW * .64;
+    for (let y = FH * .09; y < FH; y += FH * .105) { out.push([[-E, y], [FW + E, y]]); for (let k = 1; k < 5; k++) { const yy = y + FH * .105 * k / 5; out.push([[x1 - 9, yy], [x1 + 9, yy]], [[x2 - 9, yy], [x2 + 9, yy]]); } }
+    out.push([[FW * .06, -E], [FW * .06, FH + E]]); return out; } },
+  bend: { name: '트랙 곡선', f: () => { const out = [], cx = FW * .12, cy = FH * .5;
+    for (let k = 0; k < 7; k++) { const r = FW * .42 + k * 34; out.push([[cx + r, -E], [cx + r, cy], ...arc(cx, cy, r, r, 0, Math.PI / 2, 8).slice(1)]); }
+    return out; } },
+  box: { name: '박스 + 눈금', f: () => { const x = FW * .77, y1 = FH * .115, y2 = FH * .43, yb = FH * .885, out = [[[-E, y1], [x, y1]], [[-E, y2], [x, y2]], [[x, -E], [x, yb]], [[-E, yb], [x, yb]]];
     for (let k = 0; k < 4; k++) { const tx = FW * (.2 + k * .14); out.push([[tx, y1], [tx, y1 + 12]], [[tx, y2], [tx, y2 + 12]]); } return out; } },
-  key: { name: '키 + 박스', f: () => { const y = FH * .6; return [[[-E, y], [FW + E, y]], arc(FW / 2, y, FW * .19, FH * .095, Math.PI, 2 * Math.PI, 7), [[FW * .07, FH + E], [FW * .07, FH * .895], [FW * .93, FH * .895], [FW * .93, FH + E]]]; } },
-  track: { name: '트랙 레인', f: () => { const out = [], cx = FW * .5, cy = FH * .4;
-    for (let k = 0; k < 6; k++) { const rx = FW * .2 + k * 30, ry = FH * .14 + k * 30; out.push([[cx - rx, FH + E], [cx - rx, cy], ...arc(cx, cy, rx, ry, Math.PI, 2 * Math.PI, 9).slice(1, -1), [cx + rx, cy], [cx + rx, FH + E]]); }
-    return out; } }
+  key: { name: '키 + 박스', f: () => { const y = FH * .6; return [[[-E, y], [FW + E, y]], arc(FW / 2, y, FW * .19, FH * .095, Math.PI, 2 * Math.PI, 7), [[FW * .07, FH + E], [FW * .07, FH * .895], [FW * .93, FH * .895], [FW * .93, FH + E]]]; } }
 };
 const FORM_IDS = Object.keys(FORMS);
 const formOf = look => $('court').value === 'random' ? look.court.form : $('court').value;
