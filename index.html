@@ -105,6 +105,7 @@ code { background: #222; padding: 1px 6px; border-radius: 4px; font-size: 12.5px
   </div>
   <div class="grp"><b>배치</b>
     <label>헤드라인 <select id="headPos"><option value="random">랜덤</option><option value="top">위</option><option value="bottom">아래</option></select></label>
+    <label>헤드라인 구조 <select id="headMode"><option value="random">랜덤</option><option value="stack">쌓기</option><option value="stagger">엇갈림</option><option value="inline">한 줄</option><option value="center">가운데</option><option value="ends">위아래 분리</option></select></label>
     <label>정렬 <select id="align"><option value="random">랜덤</option><option value="left">왼쪽</option><option value="right">오른쪽</option></select></label>
     <label>할인·날짜 <select id="infoStyle"><option value="random">랜덤</option><option value="corners">양 끝</option><option value="stack">한쪽에 모아서</option><option value="split">따로 (날짜는 헤드라인 곁)</option><option value="underhead">헤드라인 바로 아래</option></select></label>
     <label>줄바꿈 <select id="infoBreak"><option value="random">랜덤</option><option value="two">2줄</option><option value="one">1줄</option></select></label>
@@ -112,23 +113,24 @@ code { background: #222; padding: 1px 6px; border-radius: 4px; font-size: 12.5px
     <label>날짜 크기 <input type="range" id="dateSize" min="20" max="80" value="34"></label>
   </div>
   <div class="grp"><b>배경</b>
-    <label>배경 <select id="bg"><option value="random">랜덤</option><option value="solid">단색</option><option value="gradient">컬러 그라데이션</option><option value="glow">빛번짐 텍스처</option></select></label>
+    <label>배경 <select id="bg"><option value="random">랜덤</option><option value="solid">단색</option><option value="gradient">컬러 그라데이션</option><option value="glow">빛번짐 텍스처</option><option value="photo">퍼포먼스 사진 그래픽</option></select></label>
     <label><input type="checkbox" id="grainOn" checked> 그레인</label>
     <label><input type="range" id="grain" min="0" max="60" value="14"></label>
+    <button class="ghost" id="addPhotos">사진 추가</button><span class="muted" id="photoCount"></span>
   </div>
   <div class="grp"><b>그래픽</b>
     <label><input type="checkbox" id="gMarks"> 매직 낙서</label>
     <label><input type="checkbox" id="gPattern"> 패턴</label>
+    <label>패턴 종류 <select id="patKind"><option value="random">랜덤</option></select></label>
     <label><input type="checkbox" id="gCourt" checked> 경기장 라인</label>
     <label>라인 모양 <select id="court"><option value="random">랜덤</option></select></label>
     <label>진하기 <input type="range" id="lineAmt" min="0" max="100" value="40"></label>
     <span class="muted">고른 요소는 룩의 두 번째 장에 들어가요</span>
   </div>
   <div class="grp"><b>로고</b>
-    <label>느낌 <select id="logoFx"><option value="random">랜덤</option><option value="solid">깔끔</option><option value="grain">그레인</option><option value="fade">그라데이션</option><option value="blow">번진 듯 휙</option><option value="photo">퍼포먼스 사진</option></select></label>
+    <label>느낌 <select id="logoFx"><option value="random">랜덤</option><option value="solid">깔끔</option><option value="grain">그레인</option><option value="fade">그라데이션</option><option value="blow">번진 듯 휙</option></select></label>
     <label>크기 <select id="logoSize"><option value="random">랜덤</option><option value="S">소</option><option value="M">중</option><option value="L">대</option></select></label>
     <label>위치 <select id="logoPos"><option value="random">랜덤</option><option value="beside">헤드라인 옆</option><option value="middle">가운데</option><option value="inforow">할인·날짜 사이</option><option value="end">빈 쪽 끝</option></select></label>
-    <button class="ghost" id="addPhotos">사진 추가</button><span class="muted" id="photoCount"></span>
     <input type="file" id="photoFile" multiple accept="image/*,.zip" hidden>
   </div>
 </div>
@@ -217,7 +219,7 @@ function splitMid(t) { const sp = [...t.matchAll(/ /g)].map(m => m.index); if (!
 const inkOf = (txt, s, fs) => { const m = measure(txt, fs); return { l: m.l * s, r: m.r * s, a: m.a, d: m.d }; };
 const inkW = (txt, s, h) => { const k = inkOf(txt, s, fsForAscender(txt, h)); return k.l + k.r; };
 function placeText(txt, s, fs, side, M, base, extra = {}) {
-  const k = inkOf(txt, s, fs), x = side === 'left' ? M + k.l : FW - M - k.r;
+  const k = inkOf(txt, s, fs), x = side === 'left' ? M + k.l : side === 'right' ? FW - M - k.r : FW / 2 - (k.r - k.l) / 2;
   return { txt, s, fs, x, base, font: 'NP', right: side === 'right', edge: FW - M, ink: { l: x - k.l, r: x + k.r, t: base - k.a, b: base + k.d }, ...extra };
 }
 const symH = w => w * 413 / 800;
@@ -242,9 +244,27 @@ function layout(look, rseed, relax) {
   const dLast = measure(txt[n - 1], fsForAscender(txt[n - 1], h[n - 1])).d;
   const blockH = h.reduce((a, b) => a + b, 0) + gap * (n - 1) + dLast;
   if (blockH > FH * (relax ? .62 : .46)) return null;
-  const top = pos === 'top' ? M : FH - M - blockH, bases = []; let y = top;
-  h.forEach((hh, i) => { y += (i ? gap : 0) + hh; bases.push(y); });
-  const head = txt.map((t, i) => placeText(t, S[i], fsForAscender(t, h[i]), align, M, bases[i], { h: h[i] }));
+  // structure: stacked flush / staggered / one row / centred / split to both ends
+  let mode = n === 1 ? (R() < .7 ? 'stack' : 'center') : opt('headMode', () => pick(R, ['stack', 'stack', 'stagger', 'inline', 'center', 'ends']));
+  if (n === 1 && (mode === 'stagger' || mode === 'inline' || mode === 'ends')) mode = 'stack';
+  let head;
+  if (mode === 'inline') {
+    // one row, same baseline, justified to both margins: wide word + narrow word
+    const gx = Math.round(LW * .04), share = between(R, .52, .7), hw = (LW - gx) * share / unit(wi), wW = hw * unit(wi);
+    let hn = (LW - gx - wW) / unit(ni); hn = Math.min(hn, FH * .4);
+    if (hw < 60 || hn < hw * .7) return null;
+    const hh = []; hh[wi] = hw; hh[ni] = hn; const rowH = Math.max(hw, hn), dd = Math.max(...txt.map((t, i) => measure(t, fsForAscender(t, hh[i])).d));
+    const base = pos === 'top' ? M + rowH : FH - M - dd;
+    head = txt.map((t, i) => placeText(t, S[i], fsForAscender(t, hh[i]), i === 0 ? 'left' : 'right', M, base, { h: hh[i] }));
+  } else if (mode === 'ends') {
+    // first line at the top margin, last line at the bottom margin
+    const side1 = R() < .5 ? align : other;
+    head = [placeText(txt[0], S[0], fsForAscender(txt[0], h[0]), align, M, M + h[0], { h: h[0] }), placeText(txt[1], S[1], fsForAscender(txt[1], h[1]), side1, M, FH - M - dLast, { h: h[1] })];
+  } else {
+    const top = pos === 'top' ? M : FH - M - blockH, bases = []; let y = top;
+    h.forEach((hh, i) => { y += (i ? gap : 0) + hh; bases.push(y); });
+    head = txt.map((t, i) => placeText(t, S[i], fsForAscender(t, h[i]), mode === 'center' ? 'center' : mode === 'stagger' ? (i ? other : align) : align, M, bases[i], { h: h[i] }));
+  }
   const hb = span(head);
 
   // offer / date: separate sizes, several arrangements
@@ -252,7 +272,8 @@ function layout(look, rseed, relax) {
   const ofs = fsForAscender(C.offer, oc), dfs = fsForAscender(C.date, dc), olh = Math.round(oc * 1.3), dlh = Math.round(dc * 1.3);
   const brk = $('infoBreak').value, oTwo = brk === 'two' || (brk === 'random' && R() < .72), dTwo = brk === 'two' ? true : brk === 'one' ? false : R() < .4;
   const oLines = oTwo ? splitOffer(C.offer) : [C.offer], dLines = dTwo ? splitDate(C.date) : [C.date];
-  const style = opt('infoStyle', () => pick(R, ['corners', 'corners', 'stack', 'split', 'underhead']));
+  let style = opt('infoStyle', () => pick(R, ['corners', 'corners', 'stack', 'split', 'underhead']));
+  if (mode === 'ends') style = 'underhead';
   // a group of lines anchored by its cap top or by its last baseline
   const grp = (lines, fs, cap, lh, side, edge, yy, role) => { const k = lines.length, last = edge === 'top' ? yy + cap + (k - 1) * lh : yy; return lines.map((t, i) => placeText(t, .6, fs, side, M, last - (k - 1 - i) * lh, { role })); };
   const gH = (k, cap, lh) => cap + (k - 1) * lh;
@@ -275,13 +296,15 @@ function layout(look, rseed, relax) {
   } else {
     // both right under (or over) the headline block, far end left empty
     const oSide = R() < .75 ? 'left' : 'right', dSide = oSide === 'left' ? 'right' : 'left', g2 = near + 8;
-    info = pos === 'top' ? [...G('o', oSide, 'top', hb.b + g2), ...G('d', dSide, 'top', hb.b + g2)] : [...G('o', oSide, 'base', hb.t - g2), ...G('d', dSide, 'base', hb.t - g2)];
+    if (mode === 'ends') { const under = R() < .5, ref = span([head[under ? 0 : 1]]);
+      info = under ? [...G('o', oSide, 'top', ref.b + g2), ...G('d', dSide, 'top', ref.b + g2)] : [...G('o', oSide, 'base', ref.t - g2), ...G('d', dSide, 'base', ref.t - g2)];
+    } else info = pos === 'top' ? [...G('o', oSide, 'top', hb.b + g2), ...G('d', dSide, 'top', hb.b + g2)] : [...G('o', oSide, 'base', hb.t - g2), ...G('d', dSide, 'base', hb.t - g2)];
   }
   const inside = r => r.l >= M - .5 && r.r <= FW - M + .5 && r.t >= M - .5 && r.b <= FH - M + .5;
   if (!info.every(o => inside(o.ink))) return null;
   const offers = info.filter(o => o.role === 'offer'), dates = info.filter(o => o.role === 'date');
   if (overlap(span(offers), span(dates), 28)) return null;
-  if (info.some(o => overlap(o.ink, hb, 24))) return null;
+  if (info.some(o => (mode === 'ends' ? head.some(h2 => overlap(o.ink, h2.ink, 24)) : overlap(o.ink, hb, 24)))) return null;
 
   // logo: small / medium / large (large stays modest)
   const tier = opt('logoSize', () => R() < .38 ? 'S' : R() < .8 ? 'M' : 'L'), wL = between(R, ...LOGO_W[tier]);
@@ -301,7 +324,7 @@ function layout(look, rseed, relax) {
     return null;
   };
   const tryMiddle = () => {
-    const blocks = [hb, ib].sort((a, b) => a.t - b.t), zt = blocks[0].b, zb = blocks[1].t;
+    const band = textBand({ head, info }), zt = band.t, zb = band.b;
     for (const k of [1, .85, .7]) { const w = wL * k, cy = R() < .5 ? FH / 2 : (zt + zb) / 2, r = at(FW / 2 - w / 2, cy - symH(w) / 2, w); if (r) return r; }
     return null;
   };
@@ -314,7 +337,7 @@ function layout(look, rseed, relax) {
   let logoPos = opt('logoPos', () => pick(R, ['beside', 'beside', 'middle', 'inforow', 'end'])), symbol = null;
   for (const k of [logoPos, 'middle', 'end', 'beside', 'inforow']) { symbol = T[k](); if (symbol) { logoPos = k; break; } }
   if (!symbol) return null;
-  let symStyle = opt('logoFx', () => pick(R, ['solid', 'solid', 'grain', 'fade', 'blow', 'photo'])), symDir = R() < .5 ? -1 : 1;
+  let symStyle = opt('logoFx', () => pick(R, ['solid', 'solid', 'grain', 'fade', 'blow'])), symDir = R() < .5 ? -1 : 1;
   if (symStyle === 'blow') {
     // the ghost trail must not run into type: send it to the free side
     const w = symbol.r - symbol.l, trail = d => ({ l: d < 0 ? symbol.l - w * .85 : symbol.l, r: d < 0 ? symbol.r : symbol.r + w * .85, t: symbol.t, b: symbol.b });
@@ -322,7 +345,7 @@ function layout(look, rseed, relax) {
     if (!ok(symDir)) symDir = -symDir;
     if (!ok(symDir) && $('logoFx').value !== 'blow') symStyle = 'fade';
   }
-  return { M, pos, end, align, arr, style, tier, head, info, symbol, symStyle, symDir, fadeUp: R() < .5, logoPos };
+  return { M, pos, end, align, arr, mode, style, tier, head, info, symbol, symStyle, symDir, fadeUp: R() < .5, logoPos };
 }
 function bestLayout(look) {
   for (const relax of [false, true]) for (let k = 0; k < 160; k++) { const L = layout(look, look.lseed * 7919 + k * 101, relax); if (L) return L; }
@@ -331,13 +354,15 @@ function bestLayout(look) {
 
 /* ===== backgrounds ===== */
 const scheme = look => look.color === 'brw' ? look.schemeB : look.schemeP;
-const BGK = ['solid', 'gradient', 'glow'];
-const bgKindOf = (look, piece) => { const k = $('bg').value === 'random' ? look.bgKind : $('bg').value; return piece && piece.altBg ? BGK[(BGK.indexOf(k) + 1) % 3] : k; };
+const BGK = ['solid', 'gradient', 'glow', 'photo'];
+const bgPool = () => PHOTOS.length ? BGK : BGK.slice(0, 3);
+const bgKindOf = (look, piece) => { let k = $('bg').value === 'random' ? look.bgKind : $('bg').value; const P = bgPool(); if (!P.includes(k)) k = 'glow'; return piece && piece.altBg ? P[(P.indexOf(k) + 1) % P.length] : k; };
 function baseColor(look) { const sc = scheme(look); return look.color === 'brw' ? { black: '#000000', red: RED, white: '#FFFFFF' }[sc] : { black: '#000000', charcoal: '#1C1D22' }[sc]; }
 function bgSpec(look, piece) {
   const kind = bgKindOf(look, piece), sc = scheme(look), P = PT[$('point').value], hot = look.hot;
   if (kind === 'solid') return { solid: baseColor(look) };
   if (kind === 'glow') return { glow: true, seed: look.seed, sc, color: look.color, P, hot };
+  if (kind === 'photo') return { photo: true, seed: look.seed, idx: look.photoIdx % PHOTOS.length, sc, color: look.color, P, hot };
   // stops run cold → hot. linear: hot end at top / bottom. radial: hot corner
   const g = (stops, rad) => rad ? { rad: true, corner: look.corner, hot, stops } : { lin: hot, stops };
   if (look.color === 'brw') {
@@ -353,6 +378,32 @@ function gradGeom(sp) {
   return { cx: sp.corner ? FW : 0, cy: sp.hot === 'top' ? 0 : FH, r: Math.hypot(FW, FH) * .95 };
 }
 const radialStops = st => st.map(([o, c]) => [1 - o, c]).reverse();
+// performance photo as graphic: cropped in hard, smeared by motion, mapped to brand / point colour so no person reads
+function drawPhotoBg(x, sp) {
+  const R = mulberry32(sp.seed * 29 + sp.idx * 101), img = PHOTOS[sp.idx];
+  const base = baseColor({ color: sp.color, schemeB: sp.sc, schemeP: sp.sc }), light = sp.sc === 'white';
+  const hotC = sp.color === 'brw' ? (sp.sc === 'red' ? '#ff8a96' : RED) : sp.P;
+  const ramp = (light ? ['#FFFFFF', mix(RED, '#FFFFFF', .25), RED] : sp.sc === 'red' ? ['#3a0006', RED, hotC] : [base, mix(hotC, base, .3), hotC]).map(rgbOf);
+  const z = between(R, 1.4, 2.4), sw = img.width / z, sh = sw * FH / FW, sx = (img.width - sw) * between(R, .15, .85), sy = Math.max(0, (img.height - sh) * between(R, .15, .85));
+  const vert = R() < .35, dir = R() < .5 ? 1 : -1, n = 12;
+  x.fillStyle = '#000'; x.fillRect(0, 0, FW, FH);
+  x.filter = 'grayscale(1) contrast(1.35) blur(6px)';
+  for (let k = 0; k < n; k++) { x.globalAlpha = k ? .16 : 1; x.drawImage(img, sx + (vert ? 0 : dir * k * sw * .03), sy + (vert ? dir * k * sh * .03 : 0), sw, sh, 0, 0, FW, FH); }
+  x.filter = 'none'; x.globalAlpha = 1;
+  const id = x.getImageData(0, 0, FW, FH), d = id.data; let lo = 255, hi = 0;
+  for (let i = 0; i < d.length; i += 64) { lo = Math.min(lo, d[i]); hi = Math.max(hi, d[i]); }
+  // gamma pushes most of the frame into the ground colour; only highlights glow
+  for (let i = 0; i < d.length; i += 4) {
+    const t = Math.pow(Math.max(0, Math.min(1, (d[i] - lo) / Math.max(1, hi - lo))), 1.7), s2 = t * 2, j = Math.min(1, Math.floor(s2)), f = s2 - j;
+    for (let q = 0; q < 3; q++) d[i + q] = ramp[j][q] + (ramp[j + 1][q] - ramp[j][q]) * f;
+  }
+  x.putImageData(id, 0, 0);
+  // calm the type side: fade back to the ground where the headline and info sit
+  const g = x.createLinearGradient(0, 0, 0, FH), bc = base;
+  g.addColorStop(0, bc); g.addColorStop(.22, bc + '00'); g.addColorStop(.78, bc + '00'); g.addColorStop(1, bc);
+  x.fillStyle = g; x.fillRect(0, 0, FW, FH);
+  x.save(); x.globalAlpha = .25; x.globalCompositeOperation = 'overlay'; x.drawImage(NOISE, 0, 0); x.restore();
+}
 // light bloom: soft blobs of the brand / point colour, smeared, with a baked texture
 function drawGlow(x, sp) {
   const R = mulberry32(sp.seed * 13 + 7), base = sp.color === 'brw' ? { black: '#000000', red: '#7a000e', white: '#FFFFFF' }[sp.sc] : { black: '#000000', charcoal: '#16171B' }[sp.sc];
@@ -382,6 +433,7 @@ function bgCanvas(look, piece) {
   const c = cnv(FW, FH), x = c.getContext('2d');
   if (sp.solid) { x.fillStyle = sp.solid; x.fillRect(0, 0, FW, FH); }
   else if (sp.glow) drawGlow(x, sp);
+  else if (sp.photo) drawPhotoBg(x, sp);
   else {
     const G = gradGeom(sp), g = sp.lin ? x.createLinearGradient(G.x1, G.y1, G.x2, G.y2) : x.createRadialGradient(G.cx, G.cy, 0, G.cx, G.cy, G.r);
     (sp.lin ? sp.stops : radialStops(sp.stops)).forEach(([o, col]) => g.addColorStop(o, col)); x.fillStyle = g; x.fillRect(0, 0, FW, FH);
@@ -443,21 +495,65 @@ function drawCourt(ctx, look, color) {
   ctx.restore();
 }
 // pattern: tone-on-tone repetition (training drills)
-const PATNAME = { type: '타이포 반복', hb: '하트비트 반복', drill: '드릴 줄무늬' };
+const PATNAME = { clean: '클린 반복 타이포', fabric: '패브릭 텍스처', grainhb: '그레이니 하트비트', type: '헤드라인 반복', hb: '하트비트 반복', drill: '드릴 줄무늬' };
+// mostly the guide's textures; the older repeats stay as a rare option
+const PAT_POOL = ['clean', 'clean', 'clean', 'fabric', 'fabric', 'fabric', 'grainhb', 'grainhb', 'grainhb', 'type', 'hb', 'drill'];
+const PAT_IDS = Object.keys(PATNAME);
+const patOf = look => $('patKind').value === 'random' ? look.pattern : $('patKind').value;
+// guide: type never sits directly on texture → grid / fabric live in the empty band between the type (a framing device)
+function textBand(L) {
+  const iv = [...L.head, ...L.info].map(o => [o.ink.t, o.ink.b]).sort((a, b) => a[0] - b[0]); let best = null, cur = 0;
+  for (const [t, b] of iv) { if (t - cur > (best ? best.b - best.t : 0)) best = { t: cur, b: t }; cur = Math.max(cur, b); }
+  if (FH - cur > (best ? best.b - best.t : 0)) best = { t: cur, b: FH };
+  const pad = 36; return { t: best.t + (best.t > 0 ? pad : 0), b: best.b - (best.b < FH ? pad : 0) };
+}
 function drawPattern(ctx, look, color) {
-  const R = mulberry32(look.seed * 17 + 3), kind = look.pattern, C = copy(look);
-  ctx.save(); ctx.globalAlpha = lineAlpha() * (kind === 'type' ? .3 : .5); ctx.fillStyle = color;
-  if (kind === 'type') {
+  const R = mulberry32(look.seed * 17 + 3), kind = patOf(look), C = copy(look), L = look.layout;
+  ctx.save(); ctx.fillStyle = color; ctx.strokeStyle = color;
+  const A = lineAlpha();
+  if (kind === 'clean' || kind === 'fabric') { const band = textBand(L); ctx.beginPath(); ctx.rect(0, band.t, FW, band.b - band.t); ctx.clip(); }
+  if (kind === 'clean') {
+    // clean repeating typography: a grid of small heartbeat + type lockups
+    const cols = pick(R, [6, 7, 8]), cw = FW / cols, ch = cw * 1.22, hbw = cw * .26, t = tinted(HB, color, hbw, symH(hbw)), fs = cw * .105;
+    const lines = [C.lines.join(' '), C.offer, C.date];
+    ctx.globalAlpha = A * .7; ctx.font = `${fs}px NP`;
+    for (let y = 0; y < FH; y += ch) for (let x = 0; x < FW; x += cw) {
+      ctx.drawImage(t, x + cw * .12, y + ch * .14);
+      lines.forEach((ln, i) => { ctx.save(); ctx.translate(x + cw * .12, y + ch * .14 + symH(hbw) + fs * (1.5 + i * 1.15)); ctx.scale(.62, 1); ctx.fillText(ln.toUpperCase(), 0, 0); ctx.restore(); });
+    }
+  } else if (kind === 'fabric') {
+    // fabric: stippled lines flowing over soft folds, like cloth in the wind
+    const f1 = between(R, .004, .008), f2 = between(R, .01, .018), amp = between(R, 40, 90), ph = between(R, 0, 6), tilt = between(R, -.35, .35);
+    ctx.lineWidth = 1.6;
+    for (let y0 = -120; y0 < FH + 120; y0 += 7) {
+      ctx.beginPath(); let first = true;
+      for (let x = -20; x <= FW + 20; x += 10) {
+        const y = y0 + x * tilt + amp * Math.sin(x * f1 + y0 * .004 + ph) + amp * .35 * Math.sin(x * f2 - y0 * .011);
+        const shade = .5 + .5 * Math.sin(x * f1 * 1.7 + y0 * .006 + ph * 2);
+        if (shade < .2) { first = true; continue; }
+        first ? ctx.moveTo(x, y) : ctx.lineTo(x, y); first = false;
+      }
+      ctx.globalAlpha = A * .85; ctx.stroke();
+    }
+  } else if (kind === 'grainhb') {
+    // grainy heartbeat: one huge dissolved mark as an overlay (allowed full-bleed)
+    const w = FW * between(R, 1.05, 1.4), h = symH(w), key = ['gh', color, Math.round(w), look.seed].join('|');
+    if (!LOGO_CACHE.has(key)) LOGO_CACHE.set(key, grainLogo(color, w, h, look.seed * 3 + 1, .07));
+    const g = LOGO_CACHE.get(key); ctx.globalAlpha = Math.min(1, A * 1.5);
+    ctx.drawImage(g, FW / 2 - w / 2 - g._pad + between(R, -60, 60), FH / 2 - h / 2 - g._pad + between(R, -120, 120));
+  } else if (kind === 'type') {
+    ctx.globalAlpha = A * .3;
     const rowH = between(R, 70, 120), gap = rowH * .3, words = C.lines.join(' ') + '  ';
     let y = rowH * .6, i = 0;
     while (y < FH + rowH) { const s = [1.9, .45, .9, .3][i % 4], fs = fsForAscender(words, rowH), w = measure(words, fs).w * s;
       ctx.font = `${fs}px NP`; for (let x = -((i * 137) % w); x < FW; x += w) { ctx.save(); ctx.translate(x, y); ctx.scale(s, 1); ctx.fillText(words, 0, 0); ctx.restore(); }
       y += rowH + gap; i++; }
   } else if (kind === 'hb') {
+    ctx.globalAlpha = A * .5;
     const w = between(R, 70, 110), h = symH(w), sx = w * 1.9, sy = h * 2.4, t = tinted(HB, color, w, h);
     for (let r = 0, y = h * .3; y < FH; y += sy, r++) for (let x = (r % 2) * sx / 2 - w / 2; x < FW; x += sx) ctx.drawImage(t, x, y);
   } else {
-    // drill stripes: spacing tightens toward one end like accelerating strides
+    ctx.globalAlpha = A * .5;
     let y = 0, gap = between(R, 70, 110); const th = between(R, 3, 8), k = between(R, .88, .94);
     while (y < FH) { ctx.fillRect(0, look.court.fy ? FH - y - th : y, FW, th); y += gap; gap = Math.max(10, gap * k); }
   }
@@ -479,42 +575,16 @@ let HB, NOISE, PHOTOS = [];
 function tinted(img, color, w, h) { const c = cnv(w, h), x = c.getContext('2d'); x.drawImage(img, 0, 0, c.width, c.height); x.globalCompositeOperation = 'source-in'; x.fillStyle = color; x.fillRect(0, 0, c.width, c.height); return c; }
 const LOGO_CACHE = new Map();
 // grain: the mark dissolves into particles, dense in the middle
-function grainLogo(color, w, h, seed) {
+function grainLogo(color, w, h, seed, soft = .03) {
   const p = Math.round(w * .08), c = cnv(w + p * 2, h + p * 2), x = c.getContext('2d');
-  x.filter = `blur(${Math.max(2, w * .03)}px)`; x.drawImage(tinted(HB, color, w, h), p, p); x.filter = 'none';
+  x.filter = `blur(${Math.max(2, w * soft)}px)`; x.drawImage(tinted(HB, color, w, h), p, p); x.filter = 'none';
   const id = x.getImageData(0, 0, c.width, c.height), d = id.data, R = mulberry32(seed);
   for (let i = 0; i < d.length; i += 4) { const a = d[i + 3] / 255; d[i + 3] = a > 0 && R() < Math.pow(a, 1.6) * 1.08 ? 255 : 0; }
   x.putImageData(id, 0, 0); c._pad = p; return c;
 }
-// performance photo inside the mark: cropped in, smeared and duotoned so it reads as texture, not a person
-function photoLogo(look, color, w, h, light) {
-  const c = cnv(w, h), x = c.getContext('2d'), R = mulberry32(look.seed * 7 + 5 + look.photoIdx * 31), img = PHOTOS.length ? PHOTOS[look.photoIdx % PHOTOS.length] : null;
-  if (img) {
-    const z = between(R, 1.8, 3.2), sw = img.width / z, sh = sw * h / w, sx = (img.width - sw) * between(R, .2, .8), sy = Math.max(0, (img.height - sh) * between(R, .2, .8)), dir = R() < .5 ? 1 : -1;
-    x.filter = 'grayscale(1) contrast(1.5) blur(2px)';
-    for (let k = 0; k < 8; k++) { x.globalAlpha = k ? .2 : 1; x.drawImage(img, sx + dir * k * sw * .035, sy, sw, sh, 0, 0, c.width, c.height); }
-    x.filter = 'none'; x.globalAlpha = 1;
-  } else {
-    // no photos yet: smeared streaks stand in
-    x.fillStyle = '#000'; x.fillRect(0, 0, c.width, c.height);
-    for (let k = 0; k < 40; k++) { x.fillStyle = `rgba(255,255,255,${between(R, .05, .5)})`; x.fillRect(between(R, -w, w), between(R, 0, h), between(R, w * .3, w * 1.2), between(R, 1, h * .12)); }
-    x.filter = 'blur(3px)'; x.drawImage(c, 0, 0); x.filter = 'none';
-  }
-  const id = x.getImageData(0, 0, c.width, c.height), d = id.data; let lo = 255, hi = 0;
-  for (let i = 0; i < d.length; i += 16) { lo = Math.min(lo, d[i]); hi = Math.max(hi, d[i]); }
-  const ramp = (light ? [mix(color, '#000000', .45), color, mix(color, '#ffffff', .35)] : [mix(color, '#000000', .3), color, mix(color, '#ffffff', .6)]).map(rgbOf);
-  for (let i = 0; i < d.length; i += 4) {
-    const t = Math.max(0, Math.min(1, (d[i] - lo) / Math.max(1, hi - lo))), s = t * 2, j = Math.min(1, Math.floor(s)), f = s - j;
-    for (let q = 0; q < 3; q++) d[i + q] = ramp[j][q] + (ramp[j + 1][q] - ramp[j][q]) * f;
-  }
-  x.putImageData(id, 0, 0);
-  x.globalCompositeOperation = 'destination-in'; x.drawImage(HB, 0, 0, c.width, c.height);
-  return c;
-}
 function drawLogo(ctx, look, color) {
   const L = look.layout, S = L.symbol, w = S.r - S.l, h = S.b - S.t;
   if (L.symStyle === 'grain') { const key = ['g', color, Math.round(w), look.seed].join('|'); if (!LOGO_CACHE.has(key)) LOGO_CACHE.set(key, grainLogo(color, w, h, look.seed)); const g = LOGO_CACHE.get(key); ctx.drawImage(g, S.l - g._pad, S.t - g._pad); return; }
-  if (L.symStyle === 'photo') { const light = lum(baseColor(look)) > .5, key = ['p', color, Math.round(w), look.seed, look.photoIdx, PHOTOS.length, light].join('|'); if (!LOGO_CACHE.has(key)) LOGO_CACHE.set(key, photoLogo(look, color, w, h, light)); ctx.drawImage(LOGO_CACHE.get(key), S.l, S.t); return; }
   const t = tinted(HB, color, w, h);
   if (L.symStyle === 'fade') {
     const c = cnv(w, h), x = c.getContext('2d'); x.drawImage(t, 0, 0);
@@ -560,7 +630,6 @@ function audit(look, piece) {
   const all = [...L.head.map(o => o.ink), ...L.info.map(o => o.ink), L.symbol];
   for (let i = 0; i < all.length; i++) for (let j = i + 1; j < all.length; j++) if (overlap(all[i], all[j], 8)) { out.push(['fail', '요소끼리 겹쳐요']); i = all.length; break; }
   if (col.fixes.length) out.push(['warn', `${[...new Set(col.fixes)].join('·')} 색이 바탕에 묻혀서 흰색/검정으로 바꿨어요`]);
-  if (L.symStyle === 'photo' && !PHOTOS.length) out.push(['warn', '사진이 없어서 로고 안은 임시 질감이에요 ("사진 추가")']);
   return { level: out.some(o => o[0] === 'fail') ? 'fail' : out.length ? 'warn' : 'pass', issues: out };
 }
 
@@ -588,7 +657,7 @@ async function exportSVG(look, piece, mode) {
   const img = (cv, l, t) => `<image x="${f(l)}" y="${f(t)}" width="${cv.width}" height="${cv.height}" href="${cv.toDataURL()}"/>`;
   let defs = '', bgEl;
   if (sp.solid) bgEl = `<rect width="${FW}" height="${FH}" fill="${sp.solid}"/>`;
-  else if (sp.glow) bgEl = img(bg, 0, 0);
+  else if (sp.glow || sp.photo) bgEl = img(bg, 0, 0);
   else {
     const G = gradGeom(sp), stops = (sp.lin ? sp.stops : radialStops(sp.stops)).map(([o, c]) => `<stop offset="${o}" stop-color="${c}"/>`).join('');
     defs = sp.lin ? `<linearGradient id="bg" gradientUnits="userSpaceOnUse" x1="${G.x1}" y1="${G.y1}" x2="${G.x2}" y2="${G.y2}">${stops}</linearGradient>` : `<radialGradient id="bg" gradientUnits="userSpaceOnUse" cx="${G.cx}" cy="${G.cy}" r="${f(G.r)}">${stops}</radialGradient>`;
@@ -623,7 +692,7 @@ function makeLook(seed, color) {
     seed, lseed: seed, color: color || (R() < .5 ? 'brw' : 'pt'),
     schemeB: pick(R, ['black', 'black', 'black', 'red', 'red', 'white']), schemeP: pick(R, ['black', 'charcoal', 'charcoal']),
     bgKind: pick(R, BGK), gv: Math.floor(R() * 2), corner: R() < .5 ? 0 : 1, alt: R() < .5, headPt: R() < .3,
-    court: { form: pick(R, FORM_IDS), fx: R() < .5, fy: R() < .5 }, pattern: pick(R, ['type', 'hb', 'drill']), mark: newMark(R),
+    court: { form: pick(R, FORM_IDS), fx: R() < .5, fy: R() < .5 }, pattern: pick(R, PAT_POOL), mark: newMark(R),
     photoIdx: Math.floor(R() * 1000), period: R() < .6
   };
   relayout(look);
@@ -636,18 +705,19 @@ function relayout(look) {
   const R = mulberry32(look.lseed * 3 + 1);
   look.hot = R() < .75 ? look.layout.pos : look.layout.end;
 }
-const BGNAME = { solid: '단색', gradient: '그라데이션', glow: '빛번짐' };
+const BGNAME = { solid: '단색', gradient: '그라데이션', glow: '빛번짐', photo: '사진 그래픽' };
 function piecesOf(look) {
   const g = gfxOn(), any = g.marks || g.pattern || g.court, none = { marks: false, pattern: false, court: false };
-  const names = [g.pattern && `패턴(${PATNAME[look.pattern]})`, g.court && `경기장 라인(${FORMS[formOf(look)].name})`, g.marks && '매직 낙서'].filter(Boolean);
+  const names = [g.pattern && `패턴(${PATNAME[patOf(look)]})`, g.court && `경기장 라인(${FORMS[formOf(look)].name})`, g.marks && '매직 낙서'].filter(Boolean);
   const alt = { altBg: true };
   return [
     { id: bgKindOf(look), label: `${BGNAME[bgKindOf(look)]} · 그래픽 없음`, gfx: none },
     any ? { id: 'gfx', label: `${BGNAME[bgKindOf(look)]} + ${names.join(' + ')}`, gfx: g } : { id: bgKindOf(look, alt), altBg: true, label: `${BGNAME[bgKindOf(look, alt)]} · 그래픽 없음`, gfx: none }
   ];
 }
+const HMODE = { stack: '쌓기', stagger: '엇갈림', inline: '한 줄', center: '가운데', ends: '위아래 분리' };
 const POS = { top: '위', bottom: '아래' }, ALN = { left: '왼쪽', right: '오른쪽' }, ARR = { one: '한 줄', match: '같은 높이', tall: '좁은 줄 크게', justify: '양끝 맞춤' };
-const LOGOP = { beside: '헤드라인 옆', middle: '가운데', inforow: '할인·날짜 사이', end: '빈 쪽 끝' }, FX = { solid: '깔끔', grain: '그레인', fade: '그라데이션', blow: '휙', photo: '사진' };
+const LOGOP = { beside: '헤드라인 옆', middle: '가운데', inforow: '할인·날짜 사이', end: '빈 쪽 끝' }, FX = { solid: '깔끔', grain: '그레인', fade: '그라데이션', blow: '휙' };
 const STY = { corners: '양 끝', stack: '한쪽에 모아서', split: '따로', underhead: '헤드라인 아래' }, SIZE = { S: '소', M: '중', L: '대' };
 const SCH = { black: '블랙', red: '레드', white: '화이트', charcoal: '차콜' };
 function lookRow(look, idx) {
@@ -655,17 +725,17 @@ function lookRow(look, idx) {
   const head = document.createElement('div'), L = look.layout; head.className = 'sethead';
   if (!L) { head.textContent = '이 카피로는 레이아웃을 못 만들었어요. 헤드라인을 짧게 바꿔 보세요.'; wrap.append(head); return wrap; }
   const cname = look.color === 'brw' ? '블·레·화' : '블랙+' + PTNAME[$('point').value];
-  head.innerHTML = `<b style="color:${look.color === 'brw' ? RED : PT[$('point').value]}">● ${cname}</b><span class="pair">#${look.seed} · 바탕 ${SCH[scheme(look)]} · 헤드라인 ${POS[L.pos]}·${ALN[L.align]} · ${ARR[L.arr]} · 할인·날짜 ${STY[L.style]} · 로고 ${SIZE[L.tier]}·${LOGOP[L.logoPos]}·${FX[L.symStyle]}</span>`;
+  head.innerHTML = `<b style="color:${look.color === 'brw' ? RED : PT[$('point').value]}">● ${cname}</b><span class="pair">#${look.seed} · 바탕 ${SCH[scheme(look)]} · 헤드라인 ${HMODE[L.mode]}·${POS[L.pos]}·${ALN[L.align]} · ${L.mode === 'inline' ? '양끝 맞춤' : ARR[L.arr]} · 할인·날짜 ${STY[L.style]} · 로고 ${SIZE[L.tier]}·${LOGOP[L.logoPos]}·${FX[L.symStyle]}</span>`;
   const redraw = () => wrap.replaceWith(lookRow(look, idx));
   const btn = (t, fn) => { const b = document.createElement('button'); b.textContent = t; b.onclick = () => { fn(); redraw(); }; head.appendChild(b); };
-  if ($('bg').value === 'random') btn('배경 ↻', () => { look.bgKind = BGK[(BGK.indexOf(look.bgKind) + 1) % 3]; look.gv++; });
+  if ($('bg').value === 'random') btn('배경 ↻', () => { const P = bgPool(); look.bgKind = P[(P.indexOf(bgKindOf(look)) + 1) % P.length]; look.gv++; });
   btn('바탕색 ↻', () => {
     if (look.color === 'brw') { const o = ['black', 'red', 'white']; look.schemeB = o[(o.indexOf(look.schemeB) + 1) % 3]; }
     else { look.schemeP = look.schemeP === 'black' ? 'charcoal' : 'black'; if (look.schemeP === 'black') look.headPt = !look.headPt; }
     look.gv++;
   });
-  btn('그래픽 ↻', () => { const R = mulberry32(newSeed()); look.court = { form: pick(R, FORM_IDS.filter(f => f !== look.court.form)), fx: R() < .5, fy: R() < .5 }; look.pattern = pick(R, ['type', 'hb', 'drill'].filter(p => p !== look.pattern)); look.mark = newMark(R); });
-  if (L.symStyle === 'photo') btn('로고 사진 ↻', () => look.photoIdx++);
+  btn('그래픽 ↻', () => { const R = mulberry32(newSeed()); look.court = { form: pick(R, FORM_IDS.filter(f => f !== look.court.form)), fx: R() < .5, fy: R() < .5 }; look.pattern = pick(R, PAT_POOL.filter(p => p !== look.pattern)); look.mark = newMark(R); });
+  if (bgKindOf(look) === 'photo') btn('사진 ↻', () => look.photoIdx++);
   btn('레이아웃 ↻', () => { look.lseed = newSeed(); relayout(look); });
   btn(look.color === 'brw' ? '레드 → 포인트' : '포인트 → 레드', () => look.color = look.color === 'brw' ? 'pt' : 'brw');
   const nb = document.createElement('button'); nb.textContent = '새로 ↻'; nb.onclick = () => { looks[idx] = makeLook(newSeed(), look.color); wrap.replaceWith(lookRow(looks[idx], idx)); }; head.appendChild(nb);
@@ -692,11 +762,12 @@ function regen() {
   drawAll();
 }
 const relayoutAll = () => { looks.forEach(l => relayout(l)); drawAll(); };
-{ const q = new URLSearchParams(location.search); const n = +q.get('looks'); if ([2, 4, 6, 8].includes(n)) $('nsets').value = n; for (const [k, v] of q) { const el = $(k); if (el && k !== 'looks') { if (el.type === 'checkbox') el.checked = v === '1'; else el.value = v; } } }
+PAT_IDS.forEach(id => { const o = document.createElement('option'); o.value = id; o.textContent = PATNAME[id]; $('patKind').appendChild(o); });
 FORM_IDS.forEach(id => { const o = document.createElement('option'); o.value = id; o.textContent = FORMS[id].name; $('court').appendChild(o); });
+{ const q = new URLSearchParams(location.search); const n = +q.get('looks'); if ([2, 4, 6, 8].includes(n)) $('nsets').value = n; for (const [k, v] of q) { const el = $(k); if (el && k !== 'looks') { if (el.type === 'checkbox') el.checked = v === '1'; else el.value = v; } } }
 $('regen').onclick = regen; $('nsets').onchange = regen;
-['headPos', 'align', 'infoStyle', 'infoBreak', 'offerSize', 'dateSize', 'logoPos', 'logoFx', 'logoSize', 'h1', 'h2', 'offer', 'date', 'period'].forEach(id => $(id).onchange = relayoutAll);
-['point', 'bg', 'court', 'lineAmt', 'grain', 'grainOn', 'showgrid', 'preview', 'gMarks', 'gPattern', 'gCourt'].forEach(id => $(id).onchange = drawAll);
+['headPos', 'headMode', 'align', 'infoStyle', 'infoBreak', 'offerSize', 'dateSize', 'logoPos', 'logoFx', 'logoSize', 'h1', 'h2', 'offer', 'date', 'period'].forEach(id => $(id).onchange = relayoutAll);
+['point', 'bg', 'court', 'patKind', 'lineAmt', 'grain', 'grainOn', 'showgrid', 'preview', 'gMarks', 'gPattern', 'gCourt'].forEach(id => $(id).onchange = drawAll);
 $('load').onclick = () => { const v = +$('seedIn').value; if (v > 0) { looks.unshift(makeLook(v, 'brw')); looks = looks.slice(0, +$('nsets').value); drawAll(); } };
 
 /* ===== storage (shared with v1 / v2: same database, same asset zip) ===== */
@@ -723,7 +794,7 @@ async function loadPhotos() {
   let keys = []; try { keys = (await ADB.keys()).filter(k => String(k).startsWith('photo:')).sort(); } catch (e) {}
   for (const k of keys) { try { imgs.push(await loadImg(URL.createObjectURL(await ADB.get(k)))); } catch (e) {} }
   PHOTOS = imgs.filter(Boolean); LOGO_CACHE.clear();
-  $('photoCount').textContent = `로고용 사진 ${PHOTOS.length}장`;
+  $('photoCount').textContent = `배경용 사진 ${PHOTOS.length}장`;
 }
 $('addPhotos').onclick = () => $('photoFile').click();
 $('photoFile').onchange = async e => {
@@ -782,7 +853,7 @@ async function ingest(files) {
   const msg = [];
   for (const f of files) {
     const name = f.name.toLowerCase();
-    if (name.endsWith('.zip')) { const r = await storeZip(f); msg.push(r.a ? `에셋을 불러왔어요${r.p ? ` (로고용 사진 ${r.p}장 포함)` : ''}.` : 'zip 안에서 에셋을 못 찾았어요. 팀에서 받은 zip이 맞는지 확인해 주세요.'); }
+    if (name.endsWith('.zip')) { const r = await storeZip(f); msg.push(r.a ? `에셋을 불러왔어요${r.p ? ` (사진 ${r.p}장 포함)` : ''}.` : 'zip 안에서 에셋을 못 찾았어요. 팀에서 받은 zip이 맞는지 확인해 주세요.'); }
     else if (name.endsWith('.ttf') || name.endsWith('.otf')) {
       const buf = await f.arrayBuffer(), ps = psNameOf(buf), def = FONT_DEFS.find(d => d.names.includes(ps));
       if (def) { await ADB.set('font:' + def.id, buf); FONT_OK[def.id] = false; msg.push(`${def.names[0]} 폰트를 불러왔어요.`); } else msg.push(`${f.name}: 이 제너레이터에서 쓰는 폰트가 아니에요.`);
