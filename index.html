@@ -130,7 +130,7 @@ code { background: #222; padding: 1px 6px; border-radius: 4px; font-size: 12.5px
   <div class="grp"><b>로고</b>
     <label>느낌 <select id="logoFx"><option value="random">랜덤</option><option value="solid">깔끔</option><option value="grain">그레인</option><option value="fade">그라데이션</option><option value="blow">번진 듯 휙</option></select></label>
     <label>크기 <select id="logoSize"><option value="random">랜덤</option><option value="S">소</option><option value="M">중</option><option value="L">대</option></select></label>
-    <label>위치 <select id="logoPos"><option value="random">랜덤</option><option value="beside">헤드라인 옆</option><option value="middle">가운데</option><option value="inforow">할인·날짜 사이</option><option value="end">빈 쪽 끝</option></select></label>
+    <label>위치 <select id="logoPos"><option value="random">랜덤</option><option value="beside">헤드라인 높이 · 중앙</option><option value="middle">가운데</option><option value="inforow">할인·날짜 사이</option><option value="end">빈 쪽 끝</option><option value="side">헤드라인 옆 (코리아 스타일 · 가이드 밖)</option></select></label>
     <input type="file" id="photoFile" multiple accept="image/*,.zip" hidden>
   </div>
 </div>
@@ -312,14 +312,17 @@ function layout(look, rseed, relax) {
   const free = r => inside(r) && rects.every(q => !overlap(r, q, 30));
   const at = (l, t, w) => { const r = { l, t, r: l + w, b: t + symH(w) }; return free(r) ? r : null; };
   const ib = span(info);
-  const tryBeside = () => {
+  // guide (2025 playbook, Icon positioning): portrait = horizontally centred, any height
+  // 'side' = the KR members-week habit of tucking the mark next to a word (outside the guide, opt-in / rare)
+  const tryBeside = side => () => {
     const line = head.reduce((a, b) => b.ink.r - b.ink.l < a.ink.r - a.ink.l ? b : a);
     const lineH = line.base - line.ink.t, vAlign = pick(R, ['base', 'mid']);
     for (const k of [1, .85, .7]) {
       let w = wL * k; if (symH(w) > lineH * 1.02) w = lineH * 1.02 * 800 / 413; if (w < 110) continue;
       const t = vAlign === 'base' ? line.base - symH(w) : line.base - lineH / 2 - symH(w) / 2;
-      const xs = align === 'left' ? [FW / 2 - w / 2, line.ink.r + Math.max(40, w * .3), FW - M - w] : [FW / 2 - w / 2, line.ink.l - Math.max(40, w * .3) - w, M];
-      for (const x of (R() < .5 ? xs : [xs[1], xs[0], xs[2]])) { const r = at(x, t, w); if (r) return r; }
+      const lineAlign = line.right ? 'right' : 'left';
+      const xs = !side ? [FW / 2 - w / 2] : lineAlign === 'left' ? [line.ink.r + Math.max(40, w * .3), FW - M - w] : [line.ink.l - Math.max(40, w * .3) - w, M];
+      for (const x of xs) { const r = at(x, t, w); if (r) return r; }
     }
     return null;
   };
@@ -333,8 +336,8 @@ function layout(look, rseed, relax) {
     return at(FW / 2 - w / 2, (t + b) / 2 - symH(w) / 2, w);
   };
   const tryEnd = () => { for (const k of [1, .85]) { const w = wL * k, r = at(FW / 2 - w / 2, end === 'bottom' ? FH - M - symH(w) : M, w); if (r) return r; } return null; };
-  const T = { beside: tryBeside, middle: tryMiddle, inforow: tryInfo, end: tryEnd };
-  let logoPos = opt('logoPos', () => pick(R, ['beside', 'beside', 'middle', 'inforow', 'end'])), symbol = null;
+  const T = { beside: tryBeside(false), side: tryBeside(true), middle: tryMiddle, inforow: tryInfo, end: tryEnd };
+  let logoPos = opt('logoPos', () => R() < .1 ? 'side' : pick(R, ['beside', 'beside', 'middle', 'inforow', 'end'])), symbol = null;
   for (const k of [logoPos, 'middle', 'end', 'beside', 'inforow']) { symbol = T[k](); if (symbol) { logoPos = k; break; } }
   if (!symbol) return null;
   let symStyle = opt('logoFx', () => pick(R, ['solid', 'solid', 'grain', 'fade', 'blow'])), symDir = R() < .5 ? -1 : 1;
@@ -631,6 +634,7 @@ function audit(look, piece) {
   if (L.head.length < 2) out.push(['warn', '헤드라인이 한 줄이라 "길게+좁게" 규칙을 못 지켜요']);
   else if (!(Math.max(...s) >= .85 && Math.min(...s) <= .5)) out.push(['fail', '헤드라인이 길게+좁게 조합이 아니에요']);
   if (L.symbol.r - L.symbol.l > 340) out.push(['warn', '로고가 커요']);
+  if (Math.abs((L.symbol.l + L.symbol.r) / 2 - FW / 2) > 2) out.push(['warn', '로고가 가로 중앙이 아니에요 (가이드는 중앙, 코리아 집행 사례는 있음)']);
   const all = [...L.head.map(o => o.ink), ...L.info.map(o => o.ink), L.symbol];
   for (let i = 0; i < all.length; i++) for (let j = i + 1; j < all.length; j++) if (overlap(all[i], all[j], 8)) { out.push(['fail', '요소끼리 겹쳐요']); i = all.length; break; }
   if (col.fixes.length) out.push(['warn', `${[...new Set(col.fixes)].join('·')} 색이 바탕에 묻혀서 흰색/검정으로 바꿨어요`]);
@@ -721,7 +725,7 @@ function piecesOf(look) {
 }
 const HMODE = { stack: '쌓기', stagger: '엇갈림', inline: '한 줄', center: '가운데', ends: '위아래 분리' };
 const POS = { top: '위', bottom: '아래' }, ALN = { left: '왼쪽', right: '오른쪽' }, ARR = { one: '한 줄', match: '같은 높이', tall: '좁은 줄 크게', justify: '양끝 맞춤' };
-const LOGOP = { beside: '헤드라인 옆', middle: '가운데', inforow: '할인·날짜 사이', end: '빈 쪽 끝' }, FX = { solid: '깔끔', grain: '그레인', fade: '그라데이션', blow: '휙' };
+const LOGOP = { side: '헤드라인 옆(가이드 밖)', beside: '헤드라인 높이 중앙', middle: '가운데', inforow: '할인·날짜 사이', end: '빈 쪽 끝' }, FX = { solid: '깔끔', grain: '그레인', fade: '그라데이션', blow: '휙' };
 const STY = { corners: '양 끝', stack: '한쪽에 모아서', split: '따로', underhead: '헤드라인 아래' }, SIZE = { S: '소', M: '중', L: '대' };
 const SCH = { black: '블랙', red: '레드', white: '화이트', charcoal: '차콜' };
 function lookRow(look, idx) {
